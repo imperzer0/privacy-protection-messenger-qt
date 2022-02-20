@@ -49,7 +49,7 @@ if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
     foreach (TSFILE IN ITEMS ${TRANSLATIONS})
         message("copy ${CMAKE_BINARY_DIR}/${TSFILE}.qm to ${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
-        file(COPY "${CMAKE_BINARY_DIR}/${TSFILE}.qm" DESTINATION "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
+        file(COPY "${CMAKE_BINARY_DIR}/${TSFILE}.qm" DESTINATION "${CMAKE_SOURCE_DIR}")
     endforeach ()
 else ()
     if (ANDROID)
@@ -67,7 +67,7 @@ else ()
 
     foreach (TSFILE IN ITEMS ${TRANSLATIONS})
         message("copy ${CMAKE_BINARY_DIR}/${TSFILE}.qm to ${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
-        file(COPY "${CMAKE_BINARY_DIR}/${TSFILE}.qm" DESTINATION "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
+        file(COPY "${CMAKE_BINARY_DIR}/${TSFILE}.qm" DESTINATION "${CMAKE_SOURCE_DIR}")
     endforeach ()
 endif ()
 
