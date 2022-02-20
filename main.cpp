@@ -14,6 +14,7 @@ int main(int argc, char* argv[])
 	{
 		if (w.set_language(locale)) break;
 	}
+	w.set_language("uk_UA");
 	w.show();
 	return a.exec();
 }
