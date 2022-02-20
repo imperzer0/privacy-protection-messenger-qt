@@ -19,26 +19,24 @@ bool MainWindow::set_language(const QString& language)
 		if (QCoreApplication::removeTranslator(m_translator))
 		{
 			delete m_translator;
+			this->ui->retranslateUi(this);
 		}
 	}
-	m_translator = new QTranslator(this);
+	
 	QString lang_name = QLocale(language).name();
-	QString base_name = "privacy-protection-messenger-qt_" + lang_name;
-	if (lang_name != "en_US" && !lang_name.isEmpty() && m_translator->load(":/lang/" + base_name))
+	if (lang_name == "en_US" || lang_name.isEmpty())
 	{
-		return QCoreApplication::installTranslator(m_translator);
+		m_translator = nullptr;
+		return true;
 	}
-	return false;
-}
-
-bool MainWindow::reset_language()
-{
-	if (m_translator)
+	
+	m_translator = new QTranslator(this);
+	QString base_name = "privacy-protection-messenger-qt_" + lang_name;
+	if (m_translator->load(":/lang/" + base_name))
 	{
-		if (QCoreApplication::removeTranslator(m_translator))
+		if (QCoreApplication::installTranslator(m_translator))
 		{
-			delete m_translator;
-			m_translator = nullptr;
+			this->ui->retranslateUi(this);
 			return true;
 		}
 	}

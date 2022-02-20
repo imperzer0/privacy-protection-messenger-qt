@@ -22,8 +22,6 @@ public:
 
 	bool set_language(const QString& language);
 	
-	bool reset_language();
-	
 private:
 	Ui::MainWindow* ui;
 	QTranslator* m_translator = nullptr;
