@@ -8,13 +8,13 @@ url="https://github.com/imperzer0/$pkgname"
 license=('GPL')
 depends=("privacy-protection-messenger>=1.0-0" "qt6-base")
 makedepends=("cmake>=3.0" "qt6-base")
-languages=("linux-file-server-client-qt_uk_UA")
+languages=("uk_UA")
 libfiles=("CMakeLists.txt" "main.cpp" "mainwindow.cpp" "mainwindow.h" "mainwindow.ui" "palette.xml"
           "resources.qrc")
 
 for lang in ${languages[@]}
 {
-    libfiles=(${libfiles[@]} $lang".ts")
+    libfiles=(${libfiles[@]} $pkgname"_"$lang".ts")
 }
 
 for libfile in ${libfiles[@]}

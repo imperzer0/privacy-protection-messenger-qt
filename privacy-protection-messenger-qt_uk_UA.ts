@@ -5,9 +5,8 @@
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="14"/>
-        <location filename="cmake-build-debug/privacy-protection-messenger-qt_autogen/include/ui_mainwindow.h" line="50"/>
         <source>MainWindow</source>
-        <translation type="unfinished"></translation>
+        <translation>ГоловнеВікно</translation>
     </message>
 </context>
 </TS>
