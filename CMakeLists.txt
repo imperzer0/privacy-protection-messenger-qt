@@ -48,8 +48,8 @@ if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_lrelease(privacy-protection-messenger-qt TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress)
 
     foreach (TSFILE IN ITEMS ${TRANSLATIONS})
-        message("copy ${CMAKE_BINARY_DIR}/${TSFILE}.qm to ${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
-        file(COPY "${CMAKE_BINARY_DIR}/${TSFILE}.qm" DESTINATION "${CMAKE_SOURCE_DIR}")
+        add_custom_command(TARGET privacy-protection-messenger-qt_lrelease
+                COMMAND cp "${TSFILE}.qm" "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
     endforeach ()
 else ()
     if (ANDROID)
@@ -66,8 +66,8 @@ else ()
     qt_add_lrelease(privacy-protection-messenger-qt TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress)
 
     foreach (TSFILE IN ITEMS ${TRANSLATIONS})
-        message("copy ${CMAKE_BINARY_DIR}/${TSFILE}.qm to ${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
-        file(COPY "${CMAKE_BINARY_DIR}/${TSFILE}.qm" DESTINATION "${CMAKE_SOURCE_DIR}")
+        add_custom_command(TARGET privacy-protection-messenger-qt_lrelease
+                COMMAND cp "${TSFILE}.qm" "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
     endforeach ()
 endif ()
 

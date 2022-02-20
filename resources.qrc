@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/language">
+    <qresource prefix="/lang">
         <file>privacy-protection-messenger-qt_uk_UA.qm</file>
     </qresource>
 </RCC>
