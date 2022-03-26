@@ -6,7 +6,7 @@ pkgdesc="privacy protection messenger Qt GUI"
 arch=("x86_64")
 url="https://github.com/imperzer0/$pkgname"
 license=('GPL')
-depends=("privacy-protection-messenger>=1.0-0" "qt6-base")
+depends=("qt6-base")
 makedepends=("cmake>=3.0" "qt6-base")
 languages=("uk_UA")
 libfiles=("CMakeLists.txt" "main.cpp" "mainwindow.cpp" "mainwindow.h" "mainwindow.ui" "palette.xml"
@@ -30,6 +30,7 @@ for libfile in ${libfiles[@]}
 build()
 {
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ .
+	cmake --build . --target $pkgname"_lrelease"
 	make
 }
 
