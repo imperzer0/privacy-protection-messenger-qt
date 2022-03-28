@@ -46,6 +46,12 @@ if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
     message("TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress")
     qt_add_lrelease(privacy-protection-messenger-qt TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress)
+
+    foreach (TSFILE IN ITEMS ${TRANSLATIONS})
+        add_custom_command(TARGET privacy-protection-messenger-qt_lrelease
+                COMMAND cp "${TSFILE}.qm" "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
+    endforeach ()
+
 else ()
     if (ANDROID)
         add_library(privacy-protection-messenger-qt SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
@@ -58,7 +64,13 @@ else ()
 
     #    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
     message("TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress")
-    qt5_add_lrelease(privacy-protection-messenger-qt TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress)
+    qt5_add_translations(privacy-protection-messenger-qt_translations ${TS_FILES})
+
+    foreach (TSFILE IN ITEMS ${TRANSLATIONS})
+        add_custom_command(TARGET privacy-protection-messenger-qt
+                COMMAND cp "${TSFILE}.qm" "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
+    endforeach ()
+
 endif ()
 
 target_link_libraries(privacy-protection-messenger-qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
