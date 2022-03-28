@@ -64,7 +64,7 @@ else ()
 
     #    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
     message("TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress")
-    qt5_add_translations(privacy-protection-messenger-qt_translations ${TS_FILES})
+    qt5_add_translation(privacy-protection-messenger-qt_translations ${TS_FILES})
 
     foreach (TSFILE IN ITEMS ${TRANSLATIONS})
         add_custom_command(TARGET privacy-protection-messenger-qt
