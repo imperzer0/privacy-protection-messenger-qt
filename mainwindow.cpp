@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget* parent)
             "QLineEdit:focus { "
             "border-bottom: 2px solid rgb(109, 109, 109);}"
     );
-
+//
     ui->line_pass->setStyleSheet(
             "QLineEdit{ "
             "border-bottom: 2px solid rgb(73, 73, 73);"
