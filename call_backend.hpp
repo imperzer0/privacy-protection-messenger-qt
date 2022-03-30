@@ -2,8 +2,8 @@
 // Created by imper on 3/29/22.
 //
 
-#ifndef PRIVACY_PROTECTION_MESSENGER_CLI_CALL_BACKEND_HPP
-#define PRIVACY_PROTECTION_MESSENGER_CLI_CALL_BACKEND_HPP
+#ifndef CALL_MESSENGER_BACKEND_HPP
+#define CALL_MESSENGER_BACKEND_HPP
 
 #include <cstring>
 #include <execute-process-linux-defs>
@@ -334,4 +334,4 @@ private:
 	bool began_session = false;
 };
 
-#endif //PRIVACY_PROTECTION_MESSENGER_CLI_CALL_BACKEND_HPP
+#endif //CALL_MESSENGER_BACKEND_HPP
