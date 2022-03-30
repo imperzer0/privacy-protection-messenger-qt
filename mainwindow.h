@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H
+#define PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H
 
 #include <QMainWindow>
 #include <QTranslator>
@@ -27,4 +27,4 @@ private:
 	QTranslator* m_translator = nullptr;
 };
 
-#endif // MAINWINDOW_H
+#endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H
