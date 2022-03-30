@@ -1,57 +1,43 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "call_backend.hpp"
+#include <QPalette>
 
+#define SET_PALETTE(object) (object)->setPalette(palette)
 
 MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent), ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-    ui->line_sign_in->setStyleSheet(
-            "QLineEdit{ "
-            "color: #e9eeee;"
-            "font-size: 10px;"
-            "border-bottom: 2px solid rgb(73, 73, 73);"
-            "border-radius: 0px;"
-            "padding: 0 8px;"
-            "selection-background-color: darkgray;"
-            "font-size: 16px;}"
-            "QLineEdit:focus { "
-            "border-bottom: 2px solid rgb(109, 109, 109);}"
-    );
-//
-    ui->line_pass->setStyleSheet(
-            "QLineEdit{ "
-            "border-bottom: 2px solid rgb(73, 73, 73);"
-            "border-radius: 0px;"
-            "padding: 0 8px;"
-            "selection-background-color: darkgray;"
-            "font-size: 16px;}"
-            "QLineEdit:focus { "
-            "border-bottom: 2px solid rgb(109, 109, 109);}"
-    );
-
-    ui->search_friends->setStyleSheet(
-            "QLineEdit{"
-            "padding: 0.24em;"
-            "background-color: #242F3D;"
-            "color: #F4F4F4;}"
-            );
-
-    ui->lineEdit->setStyleSheet(
-            "QLineEdit{"
-            "padding: 0.29em;"
-            "background-color: #242F3D;"
-            "color: #F4F4F4;}"
-            );
-
-
-
-    ui->button_sign_in->setStyleSheet(
-            "QAbstractButton{"
-            "color: #F4F4F4;"
-            "background-color: #3476AB;}"
-            );
+	QPalette palette("palette.xml");
+	SET_PALETTE(this);
+	SET_PALETTE(ui->authorization);
+	SET_PALETTE(ui->button_already_registered);
+	SET_PALETTE(ui->button_log_in);
+	SET_PALETTE(ui->button_send);
+	SET_PALETTE(ui->button_sign_in);
+	SET_PALETTE(ui->button_not_registered);
+	SET_PALETTE(ui->centralwidget);
+	SET_PALETTE(ui->groupBox_chat);
+	SET_PALETTE(ui->groupBox_friends);
+	SET_PALETTE(ui->label_login);
+	SET_PALETTE(ui->label_login_2);
+	SET_PALETTE(ui->label_pass);
+	SET_PALETTE(ui->label_pass_2);
+	SET_PALETTE(ui->label_welcome);
+	SET_PALETTE(ui->listView_friends);
+	SET_PALETTE(ui->line_login);
+	SET_PALETTE(ui->line_login_2);
+	SET_PALETTE(ui->line_message);
+	SET_PALETTE(ui->line_pass);
+	SET_PALETTE(ui->line_pass_2);
+	SET_PALETTE(ui->menu_bar);
+	SET_PALETTE(ui->menu_Language);
+	SET_PALETTE(ui->messaging);
+	SET_PALETTE(ui->message_browser);
+	SET_PALETTE(ui->registration);
+	SET_PALETTE(ui->search_friends);
+	SET_PALETTE(ui->stackedWidget);
 }
 
 MainWindow::~MainWindow()
@@ -88,5 +74,29 @@ bool MainWindow::set_language(const QString& language)
 		}
 	}
 	return false;
+}
+
+
+void MainWindow::on_action_English_triggered()
+{
+	this->set_language("en_US");
+}
+
+
+void MainWindow::on_action_Ukrainian_triggered()
+{
+	this->set_language("uk_UA");
+}
+
+
+void MainWindow::on_button_already_registered_clicked()
+{
+	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(1));
+}
+
+
+void MainWindow::on_button_not_registered_clicked()
+{
+	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(0));
 }
 

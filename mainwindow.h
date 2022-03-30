@@ -23,6 +23,15 @@ public:
 
 	bool set_language(const QString& language);
 
+private slots:
+    void on_action_English_triggered();
+
+    void on_action_Ukrainian_triggered();
+
+    void on_button_already_registered_clicked();
+
+    void on_button_not_registered_clicked();
+
 private:
 	Ui::MainWindow* ui;
 	QTranslator* m_translator = nullptr;
