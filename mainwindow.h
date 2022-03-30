@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTranslator>
+#include <QPushButton>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -21,7 +22,7 @@ public:
 	~MainWindow() override;
 
 	bool set_language(const QString& language);
-	
+
 private:
 	Ui::MainWindow* ui;
 	QTranslator* m_translator = nullptr;

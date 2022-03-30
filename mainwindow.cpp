@@ -5,6 +5,51 @@ MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent), ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
+    ui->line_sign_in->setStyleSheet(
+            "QLineEdit{ "
+            "color: #e9eeee;"
+            "font-size: 10px;"
+            "border-bottom: 2px solid rgb(73, 73, 73);"
+            "border-radius: 0px;"
+            "padding: 0 8px;"
+            "selection-background-color: darkgray;"
+            "font-size: 16px;}"
+            "QLineEdit:focus { "
+            "border-bottom: 2px solid rgb(109, 109, 109);}"
+    );
+
+    ui->line_pass->setStyleSheet(
+            "QLineEdit{ "
+            "border-bottom: 2px solid rgb(73, 73, 73);"
+            "border-radius: 0px;"
+            "padding: 0 8px;"
+            "selection-background-color: darkgray;"
+            "font-size: 16px;}"
+            "QLineEdit:focus { "
+            "border-bottom: 2px solid rgb(109, 109, 109);}"
+    );
+
+    ui->search_friends->setStyleSheet(
+            "QLineEdit{"
+            "padding: 0.24em;"
+            "background-color: #242F3D;"
+            "color: #F4F4F4;}"
+            );
+
+    ui->lineEdit->setStyleSheet(
+            "QLineEdit{"
+            "padding: 0.29em;"
+            "background-color: #242F3D;"
+            "color: #F4F4F4;}"
+            );
+
+
+
+    ui->button_sign_in->setStyleSheet(
+            "QAbstractButton{"
+            "color: #F4F4F4;"
+            "background-color: #3476AB;}"
+            );
 }
 
 MainWindow::~MainWindow()
