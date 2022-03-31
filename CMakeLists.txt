@@ -63,7 +63,7 @@ else ()
     endif ()
 
     #    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-    message("TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress")
+    #    message("TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress")
     qt5_add_translation(privacy-protection-messenger-qt_translations ${TS_FILES})
 
     if (NOT "${CMAKE_SOURCE_DIR}" MATCHES "${CMAKE_BINARY_DIR}")
