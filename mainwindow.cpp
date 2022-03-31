@@ -3,8 +3,6 @@
 #include "call_backend.hpp"
 #include <QPalette>
 
-#define SET_PALETTE(object) (object)->setPalette(palette)
-
 MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent), ui(new Ui::MainWindow)
 {
