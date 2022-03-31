@@ -62,10 +62,10 @@
        <bool>false</bool>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: #17212B;</string>
+       <string notr="true">background-color: #505050;</string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="registration">
        <property name="styleSheet">
@@ -186,7 +186,7 @@ color: #e9eeee;
                  </font>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">background-color: #505050</string>
                 </property>
                 <property name="inputMask">
                  <string notr="true"/>
@@ -233,10 +233,7 @@ color: #e9eeee;
                  </font>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QLineEdit:focus {
-    border: 2px solid #006080;
-}
-</string>
+                 <string notr="true">background-color: #505050</string>
                 </property>
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
@@ -392,6 +389,9 @@ color: #e9eeee;
        </layout>
       </widget>
       <widget class="QWidget" name="authorization">
+       <property name="styleSheet">
+        <string notr="true">background-color: #313c49;</string>
+       </property>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="3" column="1">
          <spacer name="spacer4">
@@ -463,7 +463,7 @@ color: #e9eeee;
                  </font>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">background-color: #505050;</string>
                 </property>
                 <property name="inputMask">
                  <string notr="true"/>
@@ -519,10 +519,7 @@ color: #e9eeee;
                  </font>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QLineEdit:focus {
-    border: 2px solid #006080;
-}
-</string>
+                 <string notr="true">background-color: #505050;</string>
                 </property>
                 <property name="maxLength">
                  <number>127</number>
@@ -719,6 +716,9 @@ color: #e9eeee;
        </layout>
       </widget>
       <widget class="QWidget" name="messaging">
+       <property name="styleSheet">
+        <string notr="true">background-color: #313c49;</string>
+       </property>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
          <widget class="QGroupBox" name="groupBox_friends">
@@ -744,7 +744,7 @@ color: #e9eeee;
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: #242F3D;
+              <string notr="true">background-color: #505050;
 padding: 0.25em;
 </string>
              </property>
@@ -772,7 +772,7 @@ padding: 0.25em;
         <item>
          <widget class="QGroupBox" name="groupBox_chat">
           <property name="styleSheet">
-           <string notr="true">background-color: #0E1621;</string>
+           <string notr="true">background-color: #202020;</string>
           </property>
           <property name="title">
            <string/>
@@ -792,7 +792,7 @@ padding: 0.25em;
              <item>
               <widget class="QLineEdit" name="line_message">
                <property name="styleSheet">
-                <string notr="true">background-color: #17212B;
+                <string notr="true">background-color: #505050;
 padding: 0.25em;</string>
                </property>
                <property name="inputMask">
@@ -846,6 +846,7 @@ padding: 0.25em;</string>
     </property>
     <addaction name="action_English"/>
     <addaction name="action_Ukrainian"/>
+    <addaction name="action_Transcarpatian"/>
    </widget>
    <addaction name="menu_Language"/>
   </widget>
@@ -857,6 +858,11 @@ padding: 0.25em;</string>
   <action name="action_Ukrainian">
    <property name="text">
     <string>Ukrainian</string>
+   </property>
+  </action>
+  <action name="action_Transcarpatian">
+   <property name="text">
+    <string>Transcarpatian</string>
    </property>
   </action>
  </widget>

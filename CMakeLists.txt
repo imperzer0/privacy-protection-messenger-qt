@@ -16,7 +16,7 @@ message("CMAKE generator - ${CMAKE_GENERATOR}")
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
 
-set(TRANSLATIONS privacy-protection-messenger-qt_uk_UA)
+set(TRANSLATIONS privacy-protection-messenger-qt_uk_UA privacy-protection-messenger-qt_ru_UA)
 set(TS_FILES)
 
 foreach (TS_FILE IN ITEMS ${TRANSLATIONS})
@@ -47,11 +47,12 @@ if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     message("TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress")
     qt_add_lrelease(privacy-protection-messenger-qt TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress)
 
-    foreach (TSFILE IN ITEMS ${TRANSLATIONS})
-        add_custom_command(TARGET privacy-protection-messenger-qt_lrelease
-                COMMAND cp "${TSFILE}.qm" "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
-    endforeach ()
-
+    if (NOT "${CMAKE_SOURCE_DIR}" MATCHES "${CMAKE_BINARY_DIR}")
+        foreach (TSFILE IN ITEMS ${TRANSLATIONS})
+            add_custom_command(TARGET privacy-protection-messenger-qt_lrelease
+                    COMMAND cp "${TSFILE}.qm" "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
+        endforeach ()
+    endif ()
 else ()
     if (ANDROID)
         add_library(privacy-protection-messenger-qt SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
@@ -66,11 +67,12 @@ else ()
     message("TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress")
     qt5_add_translation(privacy-protection-messenger-qt_translations ${TS_FILES})
 
-    foreach (TSFILE IN ITEMS ${TRANSLATIONS})
-        add_custom_command(TARGET privacy-protection-messenger-qt
-                COMMAND cp "${TSFILE}.qm" "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
-    endforeach ()
-
+    if (NOT "${CMAKE_SOURCE_DIR}" MATCHES "${CMAKE_BINARY_DIR}")
+        foreach (TSFILE IN ITEMS ${TRANSLATIONS})
+            add_custom_command(TARGET privacy-protection-messenger-qt_lrelease
+                    COMMAND cp "${TSFILE}.qm" "${CMAKE_SOURCE_DIR}/${TSFILE}.qm")
+        endforeach ()
+    endif ()
 endif ()
 
 target_link_libraries(privacy-protection-messenger-qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)

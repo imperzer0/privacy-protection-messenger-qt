@@ -5,7 +5,7 @@
     <name>MainWindow</name>
     <message>
         <source>Welcome to privacy protection messenger</source>
-        <translation>Раді вітати вас у privacy protection messenger</translation>
+        <translation>Вітаєме вас у privacy protection messenger</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;text-align: center; color: #e9eeee;&quot;&gt; Login &lt;/p&gt;</source>
@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>type your login here</source>
-        <translation>введіть свій логін тут</translation>
+        <translation>напиши свуй логін туй</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;text-align: center;&quot;&gt; Password &lt;/p&gt;</source>
@@ -21,27 +21,27 @@
     </message>
     <message>
         <source>type your password here</source>
-        <translation>введіть свій пароль тут</translation>
+        <translation>напиши свуй пароль туй</translation>
     </message>
     <message>
         <source>Sign in</source>
-        <translation>Зареєструватися</translation>
+        <translation>Зарегістроватися</translation>
     </message>
     <message>
         <source>I&apos;m already registered</source>
-        <translation>Я вже зареєстрований</translation>
+        <translation>Я вже зарегістрованый</translation>
     </message>
     <message>
         <source>Log in</source>
-        <translation>Увійти</translation>
+        <translation>Зайти</translation>
     </message>
     <message>
         <source>I&apos;m not registered yet</source>
-        <translation>Я ще не зареєстрований</translation>
+        <translation>Я ще не зарегістрованый</translation>
     </message>
     <message>
         <source>find user</source>
-        <translation>знайти користувача</translation>
+        <translation>найти пользователя</translation>
     </message>
     <message>
         <source>message</source>
@@ -49,27 +49,27 @@
     </message>
     <message>
         <source>send</source>
-        <translation>надіслати</translation>
+        <translation>Отправити</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation>Мова</translation>
+        <translation>Говор</translation>
     </message>
     <message>
         <source>English</source>
-        <translation>Англійська</translation>
+        <translation>Анґлійськый</translation>
     </message>
     <message>
         <source>Ukrainian</source>
-        <translation>Українська</translation>
+        <translation>Українськый</translation>
     </message>
     <message>
         <source>MainWindow</source>
-        <translation>ГоловнеВікно</translation>
+        <translation>ГлавныйОболок</translation>
     </message>
     <message>
         <source>Transcarpatian</source>
-        <translation>Закарпатська</translation>
+        <translation>Закарпатськый</translation>
     </message>
 </context>
 </TS>
