@@ -28,7 +28,6 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        palette.xml
         ${TS_FILES}
         )
 
@@ -65,7 +64,7 @@ else ()
 
     #    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
     message("TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES OPTIONS -compress")
-    qt5_add_translation(privacy-protection-messenger-qt_translations ${TS_FILES})
+    qt5_add_translation(privacy-protection-messenger-qt_lrelease ${TS_FILES})
 
     if (NOT "${CMAKE_SOURCE_DIR}" MATCHES "${CMAKE_BINARY_DIR}")
         foreach (TSFILE IN ITEMS ${TRANSLATIONS})
