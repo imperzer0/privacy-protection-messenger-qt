@@ -194,6 +194,9 @@ color: #e9eeee;
                 <property name="text">
                  <string notr="true"/>
                 </property>
+                <property name="maxLength">
+                 <number>63</number>
+                </property>
                 <property name="frame">
                  <bool>true</bool>
                 </property>
@@ -235,11 +238,54 @@ color: #e9eeee;
                 <property name="styleSheet">
                  <string notr="true">background-color: #505050</string>
                 </property>
+                <property name="maxLength">
+                 <number>127</number>
+                </property>
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
                 </property>
                 <property name="placeholderText">
                  <string>type your password here</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="font">
+                 <font>
+                  <pointsize>14</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Name </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="line_display_name">
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: #505050</string>
+                </property>
+                <property name="inputMask">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string notr="true"/>
+                </property>
+                <property name="maxLength">
+                 <number>127</number>
+                </property>
+                <property name="placeholderText">
+                 <string>type your &quot;real&quot; name</string>
                 </property>
                </widget>
               </item>
@@ -754,6 +800,9 @@ padding: 0.25em;
              <property name="text">
               <string notr="true"/>
              </property>
+             <property name="maxLength">
+              <number>63</number>
+             </property>
              <property name="placeholderText">
               <string>find user</string>
              </property>
@@ -800,6 +849,9 @@ padding: 0.25em;</string>
                </property>
                <property name="text">
                 <string notr="true"/>
+               </property>
+               <property name="maxLength">
+                <number>256</number>
                </property>
                <property name="placeholderText">
                 <string>message</string>
@@ -848,6 +900,15 @@ padding: 0.25em;</string>
     <addaction name="action_Ukrainian"/>
     <addaction name="action_Transcarpatian"/>
    </widget>
+   <widget class="QMenu" name="menuServer">
+    <property name="title">
+     <string>Server</string>
+    </property>
+    <addaction name="action_Set_server"/>
+    <addaction name="action_Disconnect_from_server"/>
+    <addaction name="action_Server_address"/>
+   </widget>
+   <addaction name="menuServer"/>
    <addaction name="menu_Language"/>
   </widget>
   <action name="action_English">
@@ -863,6 +924,21 @@ padding: 0.25em;</string>
   <action name="action_Transcarpatian">
    <property name="text">
     <string>Transcarpatian</string>
+   </property>
+  </action>
+  <action name="action_Set_server">
+   <property name="text">
+    <string>Set server</string>
+   </property>
+  </action>
+  <action name="action_Disconnect_from_server">
+   <property name="text">
+    <string>Disconnect from server</string>
+   </property>
+  </action>
+  <action name="action_Server_address">
+   <property name="text">
+    <string>Server:</string>
    </property>
   </action>
  </widget>
