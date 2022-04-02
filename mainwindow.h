@@ -42,10 +42,10 @@ private slots:
 	void on_button_send_clicked();
 	
 	void on_search_friends_textChanged(const QString& arg1);
-
-    void on_action_Set_server_triggered();
-
-    void on_action_Disconnect_from_server_triggered();
+	
+	void on_action_Set_server_triggered();
+	
+	void on_action_Disconnect_from_server_triggered();
 
 private:
 	Ui::MainWindow* ui;
@@ -54,6 +54,8 @@ private:
 	QString server_address;
 	
 	void set_address_in_menu_bar();
+	
+	inline bool check_limits(const QString& login, const QString& password);
 };
 
 #endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H

@@ -4,9 +4,13 @@
 #include <execute-process-linux-defs>
 #include <QInputDialog>
 
-#define INVALID_CREDENTIALS_TITLE "Invalid credentials!"
-#define INVALID_SERVER_TITLE "Invalid server address!"
-#define ASK_FOR_SERVER_TITLE "Enter server address"
+#define CLASS_NAME_STR(class) #class
+
+#define MESSAGE_BOX_TRANSLATE(str) QCoreApplication::translate(CLASS_NAME_STR(MessageBox), str)
+
+#define INVALID_CREDENTIALS_TITLE MESSAGE_BOX_TRANSLATE("Invalid credentials!")
+#define INVALID_SERVER_TITLE MESSAGE_BOX_TRANSLATE("Invalid server address!")
+#define ASK_FOR_SERVER_TITLE MESSAGE_BOX_TRANSLATE("Enter server address")
 
 MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent), ui(new Ui::MainWindow)
@@ -44,6 +48,7 @@ bool MainWindow::set_language(const QString& language)
 		if (QCoreApplication::installTranslator(m_translator))
 		{
 			this->ui->retranslateUi(this);
+			this->set_address_in_menu_bar();
 			return true;
 		}
 	}
@@ -80,34 +85,41 @@ void MainWindow::on_button_not_registered_clicked()
 	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(0));
 }
 
+inline bool MainWindow::check_limits(const QString& login, const QString& password)
+{
+	if (login.isEmpty())
+	{
+		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, MESSAGE_BOX_TRANSLATE("Login must not be empty"));
+		return false;
+	}
+	
+	if (password.isEmpty())
+	{
+		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, MESSAGE_BOX_TRANSLATE("Password must not be empty"));
+		return false;
+	}
+	
+	if (password.size() < 8)
+	{
+		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, MESSAGE_BOX_TRANSLATE("Password must be at least 8 characters long"));
+		return false;
+	}
+	
+	if (server_address.isEmpty())
+	{
+		QMessageBox::critical(this, INVALID_SERVER_TITLE, MESSAGE_BOX_TRANSLATE("No such server") + " \"" + server_address + "\"");
+		return false;
+	}
+	
+	return true;
+}
+
 void MainWindow::on_button_sign_in_clicked()
 {
 	QString login = this->ui->line_login->text(),
 			password = this->ui->line_pass->text();
 	
-	if (login.isEmpty())
-	{
-		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, "Login must not be empty");
-		return;
-	}
-	
-	if (password.isEmpty())
-	{
-		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, "Password must not be empty");
-		return;
-	}
-	
-	if (password.size() < 8)
-	{
-		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, "Password must be at least 8 characters long");
-		return;
-	}
-	
-	if (server_address.isEmpty())
-	{
-		QMessageBox::critical(this, INVALID_SERVER_TITLE, "No such server \"" + server_address + "\"");
-		return;
-	}
+	check_limits(login, password);
 	
 	delete backend;
 	backend = new call_backend(server_address.toStdString(), login.toStdString(), password.toStdString());
@@ -122,29 +134,7 @@ void MainWindow::on_button_log_in_clicked()
 	QString login = this->ui->line_login_2->text(),
 			password = this->ui->line_pass_2->text();
 	
-	if (login.isEmpty())
-	{
-		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, "Login must not be empty");
-		return;
-	}
-	
-	if (password.isEmpty())
-	{
-		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, "Password must not be empty");
-		return;
-	}
-	
-	if (password.size() < 8)
-	{
-		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, "Password must be at least 8 characters long");
-		return;
-	}
-	
-	if (server_address.isEmpty())
-	{
-		QMessageBox::critical(this, INVALID_SERVER_TITLE, "No such server \"" + server_address + "\"");
-		return;
-	}
+	check_limits(login, password);
 	
 	delete backend;
 	backend = new call_backend(server_address.toStdString(), login.toStdString(), password.toStdString());
@@ -168,7 +158,7 @@ void MainWindow::on_search_friends_textChanged(const QString& text)
 
 void MainWindow::on_action_Set_server_triggered()
 {
-	server_address = QInputDialog::getText(this, ASK_FOR_SERVER_TITLE, "Server: ");
+	server_address = QInputDialog::getText(this, ASK_FOR_SERVER_TITLE, QCoreApplication::translate(CLASS_NAME_STR(MainWindow), "Server:"));
 	this->set_address_in_menu_bar();
 }
 
@@ -181,6 +171,6 @@ void MainWindow::on_action_Disconnect_from_server_triggered()
 
 void MainWindow::set_address_in_menu_bar()
 {
-	this->ui->action_Server_address->setText("Server: " + server_address);
+	this->ui->action_Server_address->setText(QCoreApplication::translate(CLASS_NAME_STR(MainWindow), "Server:") + " " + server_address);
 }
 

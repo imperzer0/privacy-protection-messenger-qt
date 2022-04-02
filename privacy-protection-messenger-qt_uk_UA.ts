@@ -71,5 +71,60 @@
         <source>Transcarpatian</source>
         <translation>Закарпатська</translation>
     </message>
+    <message>
+        <source>Name </source>
+        <translation>Ім’я </translation>
+    </message>
+    <message>
+        <source>type your &quot;real&quot; name</source>
+        <translation>введіть своє &quot;справжнє&quot; ім’я</translation>
+    </message>
+    <message>
+        <source>Server</source>
+        <translation>Сервер</translation>
+    </message>
+    <message>
+        <source>Set server</source>
+        <translation>Установити сервер</translation>
+    </message>
+    <message>
+        <source>Disconnect from server</source>
+        <translation>Від’єднатися від сервера</translation>
+    </message>
+    <message>
+        <source>Server:</source>
+        <translation>Сервер:</translation>
+    </message>
+</context>
+<context>
+    <name>MessageBox</name>
+    <message>
+        <source>Invalid credentials!</source>
+        <translation>Недійсні реквізити!</translation>
+    </message>
+    <message>
+        <source>Invalid server address!</source>
+        <translation>Недійсний адрес сервера!</translation>
+    </message>
+    <message>
+        <source>Enter server address</source>
+        <translation>Введіть адрес сервера</translation>
+    </message>
+    <message>
+        <source>Login must not be empty</source>
+        <translation>Логін не має бути пустим</translation>
+    </message>
+    <message>
+        <source>Password must not be empty</source>
+        <translation>Пароль не має бути пустим</translation>
+    </message>
+    <message>
+        <source>Password must be at least 8 characters long</source>
+        <translation>Пароль має бути щонайменше з 8-ми символів</translation>
+    </message>
+    <message>
+        <source>No such server</source>
+        <translation>Нема такого сервера</translation>
+    </message>
 </context>
 </TS>
