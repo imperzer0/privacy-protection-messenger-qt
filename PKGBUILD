@@ -8,7 +8,7 @@ url="https://github.com/imperzer0/$pkgname"
 license=('GPL')
 depends=("qt6-base")
 makedepends=("cmake>=3.0" "qt6-base")
-languages=("uk_UA" "ru_UA")
+languages=("uk_UA" "ru_UA" "ru_RU")
 libfiles=("CMakeLists.txt" "main.cpp" "mainwindow.cpp" "mainwindow.h" "call_backend.hpp"
           "mainwindow.ui" "palette.xml" "resources.qrc")
 

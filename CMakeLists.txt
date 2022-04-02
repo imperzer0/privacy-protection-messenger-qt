@@ -19,7 +19,8 @@ message("CMAKE generator - ${CMAKE_GENERATOR}")
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
 
-set(TRANSLATIONS privacy-protection-messenger-qt_uk_UA privacy-protection-messenger-qt_ru_UA)
+set(TRANSLATIONS privacy-protection-messenger-qt_uk_UA privacy-protection-messenger-qt_ru_UA
+        privacy-protection-messenger-qt_ru_RU)
 set(TS_FILES)
 
 foreach (TS_FILE IN ITEMS ${TRANSLATIONS})

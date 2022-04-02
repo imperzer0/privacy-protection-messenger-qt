@@ -73,6 +73,11 @@ void MainWindow::on_action_Transcarpatian_triggered()
 	this->set_language("ru_UA");
 }
 
+void MainWindow::on_actionMoskalian_triggered()
+{
+	this->set_language("ru_RU");
+}
+
 
 void MainWindow::on_button_already_registered_clicked()
 {
@@ -119,7 +124,7 @@ void MainWindow::on_button_sign_in_clicked()
 	QString login = this->ui->line_login->text(),
 			password = this->ui->line_pass->text();
 	
-	check_limits(login, password);
+	if (!check_limits(login, password)) return;
 	
 	delete backend;
 	backend = new call_backend(server_address.toStdString(), login.toStdString(), password.toStdString());
@@ -134,7 +139,7 @@ void MainWindow::on_button_log_in_clicked()
 	QString login = this->ui->line_login_2->text(),
 			password = this->ui->line_pass_2->text();
 	
-	check_limits(login, password);
+	if (!check_limits(login, password)) return;
 	
 	delete backend;
 	backend = new call_backend(server_address.toStdString(), login.toStdString(), password.toStdString());

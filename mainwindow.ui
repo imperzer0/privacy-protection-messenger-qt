@@ -899,6 +899,7 @@ padding: 0.25em;</string>
     <addaction name="action_English"/>
     <addaction name="action_Ukrainian"/>
     <addaction name="action_Transcarpatian"/>
+    <addaction name="actionMoskalian"/>
    </widget>
    <widget class="QMenu" name="menuServer">
     <property name="title">
@@ -939,6 +940,11 @@ padding: 0.25em;</string>
   <action name="action_Server_address">
    <property name="text">
     <string>Server:</string>
+   </property>
+  </action>
+  <action name="actionMoskalian">
+   <property name="text">
+    <string>Moskalian</string>
    </property>
   </action>
  </widget>

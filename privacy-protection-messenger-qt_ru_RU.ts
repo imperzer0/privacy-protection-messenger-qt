@@ -1,130 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru_UA">
+<TS version="2.1" language="ru_RU">
 <context>
     <name>MainWindow</name>
     <message>
         <source>Welcome to privacy protection messenger</source>
-        <translation>Вітаєме вас у privacy protection messenger</translation>
+        <translation>А ти падло таке що забув у privacy protection messenger?</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;text-align: center; color: #e9eeee;&quot;&gt; Login &lt;/p&gt;</source>
-        <translation>&lt;p style=&quot;text-align: center; color: #e9eeee;&quot;&gt; Лоґін &lt;/p&gt;</translation>
+        <translation>&lt;p style=&quot;text-align: center; color: #e9eeee;&quot;&gt; Паляниця &lt;/p&gt;</translation>
     </message>
     <message>
         <source>type your login here</source>
-        <translation>напиши свуй лоґін туй</translation>
+        <translation>рябина</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;text-align: center;&quot;&gt; Password &lt;/p&gt;</source>
-        <translation>&lt;p style=&quot;text-align: center;&quot;&gt; Пароль &lt;/p&gt;</translation>
+        <translation>&lt;p style=&quot;text-align: center;&quot;&gt; Полуниця &lt;/p&gt;</translation>
     </message>
     <message>
         <source>type your password here</source>
-        <translation>напиши свуй пароль туй</translation>
+        <translation>лохина</translation>
     </message>
     <message>
         <source>Sign in</source>
-        <translation>Зареґістроватися</translation>
+        <translation>Заснути від рук УПА</translation>
     </message>
     <message>
         <source>I&apos;m already registered</source>
-        <translation>Я вже зареґістрованый</translation>
+        <translation>До Азова</translation>
     </message>
     <message>
         <source>Log in</source>
-        <translation>Зайти</translation>
+        <translation>Заснути від рук Азова</translation>
     </message>
     <message>
         <source>I&apos;m not registered yet</source>
-        <translation>Я ще не зареґістрованый</translation>
+        <translation>До УПА</translation>
     </message>
     <message>
         <source>find user</source>
-        <translation>найти пользователя</translation>
+        <translation>санкції жмуть?</translation>
     </message>
     <message>
         <source>message</source>
-        <translation>повідомлення</translation>
+        <translation>нічого не розумію</translation>
     </message>
     <message>
         <source>send</source>
-        <translation>Отправити</translation>
+        <translation>Суіцид</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation>Говор</translation>
+        <translation>Мєню</translation>
     </message>
     <message>
         <source>English</source>
-        <translation>Анґлійськый</translation>
+        <translation>Не знаю</translation>
     </message>
     <message>
         <source>Ukrainian</source>
-        <translation>Українськый</translation>
+        <translation>Солов’їна</translation>
     </message>
     <message>
         <source>MainWindow</source>
-        <translation>ГлавныйОболок</translation>
+        <translation>ГоловнеВікно, у яке можна стрибнути</translation>
     </message>
     <message>
         <source>Transcarpatian</source>
-        <translation>Закарпатськый</translation>
+        <translation>Закарпатська (точно не зрозумієш, бо тупий)</translation>
     </message>
     <message>
         <source>Name </source>
-        <translation>Імня </translation>
+        <translation>Укрзалізниця</translation>
     </message>
     <message>
         <source>type your &quot;real&quot; name</source>
-        <translation>напишіт своє &quot;настоящоє&quot; імня</translation>
+        <translation>ожина</translation>
     </message>
     <message>
         <source>Server</source>
-        <translation>Сервер</translation>
+        <translation>Не лізь бо згорить чебурнет</translation>
     </message>
     <message>
         <source>Set server</source>
-        <translation>Задати сервер</translation>
+        <translation>Установити сервер до якого немає доступу, бо чебурнет</translation>
     </message>
     <message>
         <source>Disconnect from server</source>
-        <translation>Удключитися уд сервера</translation>
+        <translation>Від’єднатися від сервера (не потрібно, бо не приєднувався)</translation>
     </message>
     <message>
         <source>Server:</source>
-        <translation>Сервер:</translation>
+        <translation>Сервер (не доступний):</translation>
     </message>
 </context>
 <context>
     <name>MessageBox</name>
     <message>
         <source>Invalid credentials!</source>
-        <translation>Неправилні реквізиты!</translation>
+        <translation>Тебе взламано. Панікуй!</translation>
     </message>
     <message>
         <source>Invalid server address!</source>
-        <translation>Неправилный адрес сервера!</translation>
+        <translation>Тебе взламано. Панікуй!</translation>
     </message>
     <message>
         <source>Enter server address</source>
-        <translation>Напишіт адресу сервера</translation>
+        <translation>Тебе взламано. Панікуй!</translation>
     </message>
     <message>
         <source>Login must not be empty</source>
-        <translation>Лоґін не має быти пустым</translation>
+        <translation>Тебе взламано. Панікуй!</translation>
     </message>
     <message>
         <source>Password must not be empty</source>
-        <translation>Пароль не має быти пустым</translation>
+        <translation>Тебе взламано. Панікуй!</translation>
     </message>
     <message>
         <source>Password must be at least 8 characters long</source>
-        <translation>Пароль мусит быти хотя бы із 8-ми символу</translation>
+        <translation>Тебе взламано. Панікуй!</translation>
     </message>
     <message>
         <source>No such server</source>
-        <translation>Не є такого сервера</translation>
+        <translation>Тебе взламано. Панікуй!</translation>
     </message>
 </context>
 </TS>

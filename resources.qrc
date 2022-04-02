@@ -2,5 +2,6 @@
     <qresource prefix="/lang">
         <file>privacy-protection-messenger-qt_uk_UA.qm</file>
         <file>privacy-protection-messenger-qt_ru_UA.qm</file>
+        <file>privacy-protection-messenger-qt_ru_RU.qm</file>
     </qresource>
 </RCC>
