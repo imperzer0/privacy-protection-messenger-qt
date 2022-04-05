@@ -53,11 +53,11 @@ private:
 	Ui::MainWindow* ui;
 	QTranslator* m_translator = nullptr;
 	call_backend* backend = nullptr;
-	QString server_address;
+	QString server_address = "127.0.0.1";
 	
-	void set_address_in_menu_bar();
+	void refresh_address_indicators();
 	
-	inline bool check_limits(const QString& login, const QString& password);
+	inline bool assert_data(const QString& login, const QString& password);
 };
 
 #endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H

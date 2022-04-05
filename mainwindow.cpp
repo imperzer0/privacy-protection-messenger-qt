@@ -3,6 +3,7 @@
 #include "./ui_mainwindow.h"
 #include <execute-process-linux-defs>
 #include <QInputDialog>
+#include <arpa/inet.h>
 
 #define CLASS_NAME_STR(class) #class
 
@@ -16,6 +17,7 @@ MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent), ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
+	this->setWindowTitle("Privacy Protection Messenger (on server \"" + server_address + "\")");
 }
 
 MainWindow::~MainWindow()
@@ -48,7 +50,7 @@ bool MainWindow::set_language(const QString& language)
 		if (QCoreApplication::installTranslator(m_translator))
 		{
 			this->ui->retranslateUi(this);
-			this->set_address_in_menu_bar();
+			this->refresh_address_indicators();
 			return true;
 		}
 	}
@@ -90,8 +92,42 @@ void MainWindow::on_button_not_registered_clicked()
 	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(0));
 }
 
-inline bool MainWindow::check_limits(const QString& login, const QString& password)
+inline static bool validate_number(char* str)
 {
+	for (; *str; ++str)
+		if (!isdigit(*str))
+			return false;
+	return true;
+}
+
+inline static bool validate_ip(std::string ip)
+{
+	auto tmp = ip.data();
+	for (; *tmp; ++tmp)
+		if (*tmp == ':')
+		{
+			*tmp = 0;
+			if (!validate_number(tmp + 1)) return false;
+			long port = ::atoi(tmp + 1);
+			if (port != (uint16_t)port) return false;
+			break;
+		}
+	
+	in_addr addr{ };
+	if (::inet_aton(ip.data(), &addr) == 0)
+		return false;
+	
+	return true;
+}
+
+inline bool MainWindow::assert_data(const QString& login, const QString& password)
+{
+	if (!validate_ip(server_address.toStdString()))
+	{
+		QMessageBox::critical(this, INVALID_SERVER_TITLE, MESSAGE_BOX_TRANSLATE("Invalid ip address") + " \"" + server_address + "\"");
+		return false;
+	}
+	
 	if (login.isEmpty())
 	{
 		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, MESSAGE_BOX_TRANSLATE("Login must not be empty"));
@@ -110,12 +146,6 @@ inline bool MainWindow::check_limits(const QString& login, const QString& passwo
 		return false;
 	}
 	
-	if (server_address.isEmpty())
-	{
-		QMessageBox::critical(this, INVALID_SERVER_TITLE, MESSAGE_BOX_TRANSLATE("No such server") + " \"" + server_address + "\"");
-		return false;
-	}
-	
 	return true;
 }
 
@@ -124,7 +154,7 @@ void MainWindow::on_button_sign_in_clicked()
 	QString login = this->ui->line_login->text(),
 			password = this->ui->line_pass->text();
 	
-	if (!check_limits(login, password)) return;
+	if (!assert_data(login, password)) return;
 	
 	delete backend;
 	backend = new call_backend(server_address.toStdString(), login.toStdString(), password.toStdString());
@@ -139,12 +169,19 @@ void MainWindow::on_button_log_in_clicked()
 	QString login = this->ui->line_login_2->text(),
 			password = this->ui->line_pass_2->text();
 	
-	if (!check_limits(login, password)) return;
+	if (!assert_data(login, password)) return;
 	
 	delete backend;
 	backend = new call_backend(server_address.toStdString(), login.toStdString(), password.toStdString());
-	backend->register_user(this->ui->line_display_name->text().toStdString());
-	backend->begin_session();
+	if (!backend->register_user(this->ui->line_display_name->text().toStdString()))
+		QMessageBox::critical(
+				this, MESSAGE_BOX_TRANSLATE("Registration failed"),
+				MESSAGE_BOX_TRANSLATE("This user already exists on this server or server is 'deranged'.\n"
+									  "Try connect to another server or type another login."));
+	if (!backend->begin_session())
+		QMessageBox::critical(
+				this, MESSAGE_BOX_TRANSLATE("Authorisation failed"),
+				MESSAGE_BOX_TRANSLATE("You typed incorrect login or password... or server is 'deranged'."));
 	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(2));
 }
 
@@ -163,19 +200,24 @@ void MainWindow::on_search_friends_textChanged(const QString& text)
 
 void MainWindow::on_action_Set_server_triggered()
 {
-	server_address = QInputDialog::getText(this, ASK_FOR_SERVER_TITLE, QCoreApplication::translate(CLASS_NAME_STR(MainWindow), "Server:"));
-	this->set_address_in_menu_bar();
+	auto address = QInputDialog::getText(this, ASK_FOR_SERVER_TITLE, QCoreApplication::translate(CLASS_NAME_STR(MainWindow), "Server:"));
+	if (!address.isEmpty())
+	{
+		server_address = address;
+		this->refresh_address_indicators();
+	}
 }
 
 
 void MainWindow::on_action_Disconnect_from_server_triggered()
 {
 	server_address = "";
-	this->set_address_in_menu_bar();
+	this->refresh_address_indicators();
 }
 
-void MainWindow::set_address_in_menu_bar()
+void MainWindow::refresh_address_indicators()
 {
+	this->setWindowTitle("Privacy Protection Messenger (on server \"" + server_address + "\")");
 	this->ui->action_Server_address->setText(QCoreApplication::translate(CLASS_NAME_STR(MainWindow), "Server:") + " " + server_address);
 }
 
