@@ -25,56 +25,75 @@ public:
 	inline ~call_backend()
 	{ end_session(); }
 	
-	inline void begin_session()
+	inline bool begin_session()
 	{
 		if (!began_session)
 		{
+			::pipe(op);
+			
 			char* args[]{
 					backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 					"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-					"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+					"-O", PLACEHOLDER, "-I", PLACEHOLDER,
+					"-M", PLACEHOLDER,
 					nullptr
 			};
 			args[4] = address.data();
 			args[6] = "s_begin_session";
 			args[8] = login.data();
 			args[10] = password.data();
-			args[11] = nullptr;
+			args[12] = std::to_string(op[exec::pipe::write]).data();
+			args[13] = nullptr;
 			
 			pid_t pid = exec::execute_program(args, nullptr);
 			std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
-			began_session = true;
+			::close(op[exec::pipe::write]);
+			
+			bool res;
+			rd_pipe(res);
+			::close(op[exec::pipe::read]);
+			return began_session = res;
 		}
 	}
 	
-	inline void end_session()
+	inline bool end_session()
 	{
 		if (began_session)
 		{
+			::pipe(op);
 			char* args[]{
 					backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 					"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-					"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+					"-O", PLACEHOLDER, "-I", PLACEHOLDER,
+					"-M", PLACEHOLDER,
 					nullptr
 			};
 			args[4] = address.data();
 			args[6] = "s_end_session";
 			args[8] = login.data();
 			args[10] = password.data();
-			args[11] = nullptr;
+			args[12] = std::to_string(op[exec::pipe::write]).data();
+			args[13] = nullptr;
 			
 			pid_t pid = exec::execute_program(args, nullptr);
 			std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
-			began_session = false;
+			::close(op[exec::pipe::write]);
+			
+			bool res;
+			rd_pipe(res);
+			::close(op[exec::pipe::read]);
+			return !(began_session = !res);
 		}
 	}
 	
-	inline void register_user(std::string display_name)
+	inline bool register_user(std::string display_name)
 	{
+		::pipe(op);
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+				"-M", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
@@ -82,18 +101,27 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = display_name.data();
-		args[13] = nullptr;
+		args[14] = std::to_string(op[exec::pipe::write]).data();
+		args[15] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		::close(op[exec::pipe::write]);
+		
+		bool res;
+		rd_pipe(res);
+		::close(op[exec::pipe::read]);
+		return res;
 	}
 	
-	inline std::string set_password(std::string new_password)
+	inline bool set_password(std::string new_password)
 	{
+		::pipe(op);
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+				"-M", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
@@ -101,18 +129,27 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = new_password.data();
-		args[13] = nullptr;
+		args[14] = std::to_string(op[exec::pipe::write]).data();
+		args[15] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		::close(op[exec::pipe::write]);
+		
+		bool res;
+		rd_pipe(res);
+		::close(op[exec::pipe::read]);
+		return res;
 	}
 	
-	inline void set_display_name(std::string display_name)
+	inline bool set_display_name(std::string display_name)
 	{
+		::pipe(op);
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+				"-M", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
@@ -120,51 +157,54 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = display_name.data();
+		args[14] = std::to_string(op[exec::pipe::write]).data();
 		args[13] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		::close(op[exec::pipe::write]);
+		
+		bool res;
+		rd_pipe(res);
+		::close(op[exec::pipe::read]);
+		return res;
 	}
 	
-	inline std::string get_display_name()
+	inline bool get_display_name(std::string& display_name)
 	{
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
+				"-M", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
 		args[6] = "s_get_display_name";
 		args[8] = login.data();
 		args[10] = password.data();
-		args[11] = nullptr;
+		args[12] = std::to_string(op[exec::pipe::write]).data();
+		args[13] = nullptr;
 		
-		int p[2];
-		::pipe(p);
-		
-		pid_t pid = exec::execute_program(args, nullptr, exec::std_out.redirect_to(p[exec::pipe::write]));
+		pid_t pid = exec::execute_program(args, nullptr);
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
-		::close(p[exec::pipe::write]);
+		::close(op[exec::pipe::write]);
 		
-		FILE* fd = ::fdopen(p[exec::pipe::read], "rb");
-		std::array<char, 64> tmp{ };
-		std::string res;
-		while (::fgets(tmp.data(), 64, fd))
-			res += tmp.data();
-		::fclose(fd);
-		
-		::close(p[exec::pipe::read]);
-		
+		bool res;
+		rd_pipe(res);
+		rd_pipe(display_name);
+		::close(op[exec::pipe::read]);
 		return res;
 	}
 	
-	inline std::string check_online_status(std::string user)
+	inline bool check_online_status(bool& online, std::string user)
 	{
+		::pipe(op);
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+				"-M", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
@@ -172,33 +212,28 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = user.data();
-		args[13] = nullptr;
+		args[14] = std::to_string(op[exec::pipe::write]).data();
+		args[15] = nullptr;
 		
-		int p[2];
-		::pipe(p);
-		
-		pid_t pid = exec::execute_program(args, nullptr, exec::std_out.redirect_to(p[exec::pipe::write]));
+		pid_t pid = exec::execute_program(args, nullptr);
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
-		::close(p[exec::pipe::write]);
+		::close(op[exec::pipe::write]);
 		
-		FILE* fd = ::fdopen(p[exec::pipe::read], "rb");
-		std::array<char, 64> tmp{ };
-		std::string res;
-		while (::fgets(tmp.data(), 64, fd))
-			res += tmp.data();
-		::fclose(fd);
-		
-		::close(p[exec::pipe::read]);
-		
+		bool res;
+		rd_pipe(res);
+		rd_pipe(online);
+		::close(op[exec::pipe::read]);
 		return res;
 	}
 	
-	inline std::string find_users_by_display_name(std::string key)
+	inline bool find_users_by_display_name(std::list<std::string>& list, std::string key)
 	{
+		::pipe(op);
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+				"-M", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
@@ -206,33 +241,35 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = key.data();
-		args[13] = nullptr;
-		
-		int p[2];
-		::pipe(p);
+		args[14] = std::to_string(op[exec::pipe::write]).data();
+		args[15] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr, exec::std_out.redirect_to(p[exec::pipe::write]));
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
-		::close(p[exec::pipe::write]);
+		::close(op[exec::pipe::write]);
 		
-		FILE* fd = ::fdopen(p[exec::pipe::read], "rb");
-		std::array<char, 64> tmp{ };
-		std::string res;
-		while (::fgets(tmp.data(), 64, fd))
-			res += tmp.data();
-		::fclose(fd);
-		
-		::close(p[exec::pipe::read]);
-		
+		bool res;
+		rd_pipe(res);
+		size_t size;
+		rd_pipe(size);
+		std::string tmp;
+		for (size_t i = 0; i < size; ++i)
+		{
+			rd_pipe(tmp);
+			list.push_back(tmp);
+		}
+		::close(op[exec::pipe::read]);
 		return res;
 	}
 	
-	inline std::string find_users_by_login(std::string key)
+	inline bool find_users_by_login(std::list<std::string>& list, std::string key)
 	{
+		::pipe(op);
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+				"-M", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
@@ -240,34 +277,36 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = key.data();
-		args[13] = nullptr;
-		
-		int p[2];
-		::pipe(p);
+		args[14] = std::to_string(op[exec::pipe::write]).data();
+		args[15] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr, exec::std_out.redirect_to(p[exec::pipe::write]));
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
-		::close(p[exec::pipe::write]);
+		::close(op[exec::pipe::write]);
 		
-		FILE* fd = ::fdopen(p[exec::pipe::read], "rb");
-		std::array<char, 64> tmp{ };
-		std::string res;
-		while (::fgets(tmp.data(), 64, fd))
-			res += tmp.data();
-		::fclose(fd);
-		
-		::close(p[exec::pipe::read]);
-		
+		bool res;
+		rd_pipe(res);
+		size_t size;
+		rd_pipe(size);
+		std::string tmp;
+		for (size_t i = 0; i < size; ++i)
+		{
+			rd_pipe(tmp);
+			list.push_back(tmp);
+		}
+		::close(op[exec::pipe::read]);
 		return res;
 	}
 	
-	inline void send_message(std::string user, const std::vector<char>& message)
+	inline bool send_message(std::string user, const std::vector<char>& message)
 	{
-		int datapipe[2];
+		::pipe(op);
+		::pipe(ip);
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+				"-M", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
@@ -275,56 +314,50 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = user.data();
-		args[14] = std::to_string(datapipe[exec::pipe::read]).data();
+		args[14] = std::to_string(op[exec::pipe::write]).data();
+		args[16] = std::to_string(ip[exec::pipe::read]).data();
 		
-		size_t size = message.size();
-		::write(datapipe[exec::pipe::write], &size, sizeof size);
-		if (!message.empty()) ::write(datapipe[exec::pipe::write], message.data(), size);
-		::close(datapipe[exec::pipe::write]);
+		wr_pipe(message);
+		::close(ip[exec::pipe::write]);
 		
 		pid_t pid = exec::execute_program(args, nullptr);
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
-		::close(datapipe[exec::pipe::read]);
+		::close(ip[exec::pipe::read]);
+		::close(op[exec::pipe::write]);
+		
+		bool res;
+		rd_pipe(res);
+		::close(op[exec::pipe::read]);
+		return res;
 	}
 	
-	inline std::vector<char> query_incoming(std::string& user)
+	inline bool query_incoming(std::string& user, std::vector<char>& message)
 	{
-		int datapipe[2];
+		::pipe(op);
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-M", PLACEHOLDER, "-P", PLACEHOLDER,
+				"-M", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
 		args[6] = "s_query_incoming";
 		args[8] = login.data();
 		args[10] = password.data();
-		args[12] = "placeholder";
-		args[14] = std::to_string(datapipe[exec::pipe::write]).data();
+		args[12] = user.data();
+		args[14] = std::to_string(op[exec::pipe::write]).data();
+		args[15] = nullptr;
 		
-		int p[2];
-		::pipe(p);
-		
-		pid_t pid = exec::execute_program(args, nullptr, exec::std_out.redirect_to(p[exec::pipe::write]));
+		pid_t pid = exec::execute_program(args, nullptr);
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
-		::close(datapipe[exec::pipe::write]);
-		::close(p[exec::pipe::write]);
+		::close(op[exec::pipe::write]);
 		
-		size_t size;
-		::read(datapipe[exec::pipe::read], &size, sizeof size);
-		std::vector<char> message(size, 0);
-		if (size > 0) ::read(datapipe[exec::pipe::write], message.data(), size);
-		::close(datapipe[exec::pipe::read]);
-		
-		FILE* fd = ::fdopen(p[exec::pipe::read], "rb");
-		std::array<char, 64> tmp{ };
-		std::string res;
-		while (::fgets(tmp.data(), 64, fd))
-			res += tmp.data();
-		::fclose(fd);
-		
-		::close(p[exec::pipe::read]);
+		bool res;
+		rd_pipe(res);
+		rd_pipe(user);
+		rd_pipe(message);
+		return res;
 	}
 
 private:
@@ -332,6 +365,39 @@ private:
 	std::string login;
 	std::string password;
 	bool began_session = false;
+	int ip[2], op[2];
+	
+	template <typename T>
+	void rd_pipe(T& val)
+	{
+		::read(op[exec::pipe::read], &val, sizeof val);
+	}
+	
+	template <template <typename> typename Container, typename T>
+	void rd_pipe(Container<T>& cont)
+	{
+		size_t size;
+		::read(op[exec::pipe::read], &size, sizeof size);
+		if (size > 0)
+		{
+			cont.resize(size + 1, 0);
+			::read(op[exec::pipe::read], cont.data(), size);
+		}
+	}
+	
+	template <typename T>
+	void wr_pipe(const T& val)
+	{
+		::write(ip[exec::pipe::write], &val, sizeof val);
+	}
+	
+	template <template <typename> typename Container, typename T>
+	void wr_pipe(const Container<T>& cont)
+	{
+		size_t size = cont.size();
+		::write(ip[exec::pipe::write], &size, sizeof size);
+		if (size > 0) ::write(ip[exec::pipe::write], cont.data(), size);
+	}
 };
 
 #endif //CALL_MESSENGER_BACKEND_HPP
