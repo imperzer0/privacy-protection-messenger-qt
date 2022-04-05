@@ -244,7 +244,7 @@ public:
 		args[14] = std::to_string(op[exec::pipe::write]).data();
 		args[15] = nullptr;
 		
-		pid_t pid = exec::execute_program(args, nullptr, exec::std_out.redirect_to(p[exec::pipe::write]));
+		pid_t pid = exec::execute_program(args, nullptr);
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
 		::close(op[exec::pipe::write]);
 		
@@ -280,7 +280,7 @@ public:
 		args[14] = std::to_string(op[exec::pipe::write]).data();
 		args[15] = nullptr;
 		
-		pid_t pid = exec::execute_program(args, nullptr, exec::std_out.redirect_to(p[exec::pipe::write]));
+		pid_t pid = exec::execute_program(args, nullptr);
 		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
 		::close(op[exec::pipe::write]);
 		
