@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>848</width>
-    <height>499</height>
+    <width>895</width>
+    <height>516</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -65,7 +65,7 @@
        <string notr="true">background-color: #505050;</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="registration">
        <property name="styleSheet">
@@ -768,6 +768,12 @@ color: #e9eeee;
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
          <widget class="QGroupBox" name="groupBox_friends">
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="title">
            <string/>
           </property>
@@ -810,6 +816,9 @@ padding: 0.25em;
            </item>
            <item>
             <widget class="QListView" name="listView_friends">
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::AdjustToContents</enum>
+             </property>
              <property name="uniformItemSizes">
               <bool>false</bool>
              </property>
@@ -888,7 +897,7 @@ padding: 0.25em;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>848</width>
+     <width>895</width>
      <height>21</height>
     </rect>
    </property>
