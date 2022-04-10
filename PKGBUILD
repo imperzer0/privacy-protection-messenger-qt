@@ -38,3 +38,9 @@ package()
 {
 	install -Dm755 $pkgname "$pkgdir/usr/bin/$pkgname"
 }
+
+notarch_package()
+{
+	cp -f $pkgname "$pkgdir/usr/bin/$pkgname"
+	chmod 755 "$pkgdir/usr/bin/$pkgname"
+}
