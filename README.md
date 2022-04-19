@@ -2,18 +2,26 @@
 Messenger client GUI (Qt)
 
 # Requirements
-**privacy-protection-messenger-qt** requires *https://github.com/imperzer0/privacy-protection-messenger* installed.
+**privacy-protection-messenger-qt** requires *<a href="https://github.com/imperzer0/privacy-protection-messenger">privacy-protection-messenger</a>* installed.
 
 # Installation
+### From AUR
+```bash
+yay -Sy privacy-protection-messenger-qt
+```
+
+### From repository
 ```bash
 git clone https://github.com/imperzer0/privacy-protection-messenger-qt.git
 cd privacy-protection-messenger-qt
 ```
-On archlinux
+
+#### Archlinux
 ```bash
 makepkg -sif
 ```
-On other distributions
+
+#### Other distributions
 ```bash
 sudo bash -c ". ./PKGBUILD && build && notarch_package"
 ```

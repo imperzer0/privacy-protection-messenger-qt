@@ -1,28 +1,30 @@
 pkgname="privacy-protection-messenger-qt"
-epoch=1
-pkgver=0
+pkgver=1.0
 pkgrel=0
-pkgdesc="privacy protection messenger Qt GUI"
+pkgdesc="Privacy Protection Messenger Qt GUI"
+author="imperzer0"
+url="https://github.com/$author/$pkgname"
 arch=("x86_64")
-url="https://github.com/imperzer0/$pkgname"
-license=('GPL')
-depends=("qt6-base")
+license=('GPL3')
+depends=("qt6-base" "privacy-protection-messenger>=1.2-1")
 makedepends=("cmake>=3.0" "qt6-base")
-languages=("uk_UA" "ru_UA" "ru_RU")
-libfiles=("CMakeLists.txt" "main.cpp" "mainwindow.cpp" "mainwindow.h" "call_backend.hpp"
-          "mainwindow.ui" "palette.xml" "resources.qrc")
 
-for lang in ${languages[@]}
+_srcprefix="local:/"
+_languages=("uk_UA" "ru_UA" "ru_RU")
+_libfiles=("CMakeLists.txt" "main.cpp" "mainwindow.cpp" "mainwindow.h" "call_backend.hpp"
+          "mainwindow.ui" "resources.qrc")
+
+for _lang in ${_languages[@]}
 {
-    libfiles=(${libfiles[@]} $pkgname"_"$lang".ts")
+    _libfiles=(${_libfiles[@]} $pkgname"_"$_lang".ts")
 }
 
-for libfile in ${libfiles[@]}
+for _libfile in ${_libfiles[@]}
 {
-    source=(${source[@]} "local://$libfile")
+    source=(${source[@]} "$_srcprefix/$_libfile")
 }
 
-for libfile in ${libfiles[@]}
+for _libfile in ${_libfiles[@]}
 {
     md5sums=(${md5sums[@]} "SKIP")
 }
@@ -30,7 +32,6 @@ for libfile in ${libfiles[@]}
 build()
 {
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ .
-	cmake --build . --target $pkgname"_lrelease"
 	make
 }
 
