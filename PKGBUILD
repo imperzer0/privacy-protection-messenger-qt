@@ -1,12 +1,12 @@
 pkgname="privacy-protection-messenger-qt"
-pkgver=1.0
+pkgver=1.1
 pkgrel=0
 pkgdesc="Privacy Protection Messenger Qt GUI"
 author="imperzer0"
 url="https://github.com/$author/$pkgname"
 arch=("x86_64")
 license=('GPL3')
-depends=("qt6-base" "privacy-protection-messenger>=1.2-1")
+depends=("qt6-base" "privacy-protection-messenger>=1.3-1")
 makedepends=("cmake>=3.0" "qt6-base")
 
 _srcprefix="local:/"

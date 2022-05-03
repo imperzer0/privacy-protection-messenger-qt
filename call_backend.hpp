@@ -2,13 +2,14 @@
 // Created by imper on 3/29/22.
 //
 
-#ifndef CALL_MESSENGER_BACKEND_HPP
-#define CALL_MESSENGER_BACKEND_HPP
+#ifndef MESSENGER_BACKEND_HPP
+#define MESSENGER_BACKEND_HPP
 
 #include <cstring>
 #include <execute-process-linux>
 #include <iostream>
 #include <vector>
+#include <list>
 
 #define PLACEHOLDER nullptr
 
@@ -46,13 +47,13 @@ public:
 			args[13] = nullptr;
 			
 			pid_t pid = exec::execute_program(args, nullptr);
-			std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+			auto exitcode = exec::wait_for_program(pid);
+			std::clog << "Backend executed with exit code " << exitcode << ".\n";
 			::close(op[exec::pipe::write]);
 			
-			auto res = false;
+			bool res = false;
 			rd_pipe(res);
-			if ((began_session = res))
-				rd_pipe(prikey);
+			if ((began_session = res)) rd_pipe(prikey);
 			::close(op[exec::pipe::read]);
 			return res;
 		}
@@ -78,10 +79,11 @@ public:
 			args[13] = nullptr;
 			
 			pid_t pid = exec::execute_program(args, nullptr);
-			std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+			auto exitcode = exec::wait_for_program(pid);
+			std::clog << "Backend executed with exit code " << exitcode << ".\n";
 			::close(op[exec::pipe::write]);
 			
-			auto res = false;
+			bool res = false;
 			rd_pipe(res);
 			::close(op[exec::pipe::read]);
 			return !(began_session = !res);
@@ -103,14 +105,16 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = display_name.data();
-		args[14] = std::to_string(op[exec::pipe::write]).data();
+		auto opstr = std::to_string(op[exec::pipe::write]);
+		args[14] = opstr.data();
 		args[15] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
-		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		auto exitcode = exec::wait_for_program(pid);
+		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
 		
-		auto res = false;
+		bool res = false;
 		rd_pipe(res);
 		::close(op[exec::pipe::read]);
 		return res;
@@ -131,16 +135,20 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = new_password.data();
-		args[14] = std::to_string(op[exec::pipe::write]).data();
+		auto opstr = std::to_string(op[exec::pipe::write]);
+		args[14] = opstr.data();
 		args[15] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
-		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		auto exitcode = exec::wait_for_program(pid);
+		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
 		
-		auto res = false;
+		bool res = false;
 		rd_pipe(res);
 		::close(op[exec::pipe::read]);
+		
+		if (res) password = new_password;
 		return res;
 	}
 	
@@ -159,14 +167,16 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = display_name.data();
-		args[14] = std::to_string(op[exec::pipe::write]).data();
+		auto opstr = std::to_string(op[exec::pipe::write]);
+		args[14] = opstr.data();
 		args[13] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
-		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		auto exitcode = exec::wait_for_program(pid);
+		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
 		
-		auto res = false;
+		bool res = false;
 		rd_pipe(res);
 		::close(op[exec::pipe::read]);
 		return res;
@@ -189,13 +199,13 @@ public:
 		args[13] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
-		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		auto exitcode = exec::wait_for_program(pid);
+		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
 		
-		auto res = false;
+		bool res = false;
 		rd_pipe(res);
-		if (res)
-			rd_pipe(display_name);
+		if (res) rd_pipe(display_name);
 		::close(op[exec::pipe::read]);
 		return res;
 	}
@@ -215,17 +225,18 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = user.data();
-		args[14] = std::to_string(op[exec::pipe::write]).data();
+		auto opstr = std::to_string(op[exec::pipe::write]);
+		args[14] = opstr.data();
 		args[15] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
-		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		auto exitcode = exec::wait_for_program(pid);
+		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
 		
-		auto res = false;
+		bool res = false;
 		rd_pipe(res);
-		if (res)
-			rd_pipe(online);
+		if (res) rd_pipe(online);
 		::close(op[exec::pipe::read]);
 		return res;
 	}
@@ -245,22 +256,27 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = key.data();
-		args[14] = std::to_string(op[exec::pipe::write]).data();
+		auto opstr = std::to_string(op[exec::pipe::write]);
+		args[14] = opstr.data();
 		args[15] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
-		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		auto exitcode = exec::wait_for_program(pid);
+		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
 		
-		auto res = false;
+		bool res = false;
 		rd_pipe(res);
-		size_t size;
-		rd_pipe(size);
-		std::string tmp;
-		for (size_t i = 0; i < size; ++i)
+		if (res)
 		{
-			rd_pipe(tmp);
-			list.push_back(tmp);
+			size_t size;
+			rd_pipe(size);
+			std::string tmp;
+			for (size_t i = 0; i < size; ++i)
+			{
+				rd_pipe(tmp);
+				list.push_back(tmp);
+			}
 		}
 		::close(op[exec::pipe::read]);
 		return res;
@@ -281,22 +297,27 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = key.data();
-		args[14] = std::to_string(op[exec::pipe::write]).data();
+		auto opstr = std::to_string(op[exec::pipe::write]);
+		args[14] = opstr.data();
 		args[15] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr);
-		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		auto exitcode = exec::wait_for_program(pid);
+		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
 		
-		auto res = false;
+		bool res = false;
 		rd_pipe(res);
-		size_t size;
-		rd_pipe(size);
-		std::string tmp;
-		for (size_t i = 0; i < size; ++i)
+		if (res)
 		{
-			rd_pipe(tmp);
-			list.push_back(tmp);
+			size_t size;
+			rd_pipe(size);
+			std::string tmp;
+			for (size_t i = 0; i < size; ++i)
+			{
+				rd_pipe(tmp);
+				list.push_back(tmp);
+			}
 		}
 		::close(op[exec::pipe::read]);
 		return res;
@@ -318,19 +339,22 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = user.data();
-		args[14] = std::to_string(op[exec::pipe::write]).data();
-		args[16] = std::to_string(ip[exec::pipe::read]).data();
+		auto opstr = std::to_string(op[exec::pipe::write]);
+		args[14] = opstr.data();
+		auto ipstr = std::to_string(ip[exec::pipe::read]);
+		args[16] = ipstr.data();
 		
 		wr_pipe(message);
 		wr_pipe(prikey);
 		::close(ip[exec::pipe::write]);
 		
 		pid_t pid = exec::execute_program(args, nullptr);
-		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		auto exitcode = exec::wait_for_program(pid);
+		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(ip[exec::pipe::read]);
 		::close(op[exec::pipe::write]);
 		
-		auto res = false;
+		bool res = false;
 		rd_pipe(res);
 		::close(op[exec::pipe::read]);
 		return res;
@@ -352,18 +376,21 @@ public:
 		args[8] = login.data();
 		args[10] = password.data();
 		args[12] = user.data();
-		args[14] = std::to_string(op[exec::pipe::write]).data();
-		args[16] = std::to_string(ip[exec::pipe::read]).data();
+		auto opstr = std::to_string(op[exec::pipe::write]);
+		args[14] = opstr.data();
+		auto ipstr = std::to_string(ip[exec::pipe::read]);
+		args[16] = ipstr.data();
 		
 		wr_pipe(prikey);
 		::close(ip[exec::pipe::write]);
 		
 		pid_t pid = exec::execute_program(args, nullptr);
-		std::clog << "Backend executed with exit code " << exec::wait_for_program(pid) << ".\n";
+		auto exitcode = exec::wait_for_program(pid);
+		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(ip[exec::pipe::read]);
 		::close(op[exec::pipe::write]);
 		
-		auto res = false;
+		bool res = false;
 		rd_pipe(res);
 		if (res)
 		{
@@ -415,4 +442,4 @@ private:
 	}
 };
 
-#endif //CALL_MESSENGER_BACKEND_HPP
+#endif //MESSENGER_BACKEND_HPP
