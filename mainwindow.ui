@@ -154,7 +154,7 @@ color: #e9eeee;
                <enum>QLayout::SetDefaultConstraint</enum>
               </property>
               <item>
-               <widget class="QLabel" name="label_login">
+               <widget class="QLabel" name="label_login_reg">
                 <property name="font">
                  <font>
                   <family>Consolas for Powerline</family>
@@ -171,7 +171,7 @@ color: #e9eeee;
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="line_login">
+               <widget class="QLineEdit" name="line_login_reg">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -210,7 +210,7 @@ color: #e9eeee;
             <item>
              <layout class="QHBoxLayout" name="layout14">
               <item>
-               <widget class="QLabel" name="label_pass">
+               <widget class="QLabel" name="label_pass_reg">
                 <property name="font">
                  <font>
                   <family>Consolas for Powerline</family>
@@ -227,7 +227,7 @@ color: #e9eeee;
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="line_pass">
+               <widget class="QLineEdit" name="line_pass_reg">
                 <property name="font">
                  <font>
                   <family>Consolas for Powerline FixedD</family>
@@ -319,7 +319,7 @@ color: #e9eeee;
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="button_sign_in">
+               <widget class="QPushButton" name="button_sign_up">
                 <property name="font">
                  <font>
                   <family>Consolas for Powerline FixedD</family>
@@ -335,7 +335,7 @@ color: #e9eeee;
                  <string notr="true"/>
                 </property>
                 <property name="text">
-                 <string>Sign in</string>
+                 <string>Sign up</string>
                 </property>
                </widget>
               </item>
@@ -471,7 +471,7 @@ color: #e9eeee;
                <enum>QLayout::SetDefaultConstraint</enum>
               </property>
               <item>
-               <widget class="QLabel" name="label_login_2">
+               <widget class="QLabel" name="label_login_log">
                 <property name="font">
                  <font>
                   <family>Consolas for Powerline</family>
@@ -488,7 +488,7 @@ color: #e9eeee;
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="line_login_2">
+               <widget class="QLineEdit" name="line_login_log">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -533,7 +533,7 @@ color: #e9eeee;
             <item>
              <layout class="QHBoxLayout" name="layout4">
               <item>
-               <widget class="QLabel" name="label_pass_2">
+               <widget class="QLabel" name="label_pass_log">
                 <property name="font">
                  <font>
                   <family>Consolas for Powerline</family>
@@ -550,7 +550,7 @@ color: #e9eeee;
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="line_pass_2">
+               <widget class="QLineEdit" name="line_pass_log">
                 <property name="minimumSize">
                  <size>
                   <width>210</width>
@@ -815,7 +815,7 @@ padding: 0.25em;
             </widget>
            </item>
            <item>
-            <widget class="QListView" name="listView_friends">
+            <widget class="QListWidget" name="friends_list_widget">
              <property name="sizeAdjustPolicy">
               <enum>QAbstractScrollArea::AdjustToContents</enum>
              </property>
@@ -918,6 +918,13 @@ padding: 0.25em;</string>
     <addaction name="action_Disconnect_from_server"/>
     <addaction name="action_Server_address"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="action_Logout"/>
+   </widget>
+   <addaction name="menuSettings"/>
    <addaction name="menuServer"/>
    <addaction name="menu_Language"/>
   </widget>
@@ -954,6 +961,11 @@ padding: 0.25em;</string>
   <action name="actionMoskalian">
    <property name="text">
     <string>Moskalian</string>
+   </property>
+  </action>
+  <action name="action_Logout">
+   <property name="text">
+    <string>Logout</string>
    </property>
   </action>
  </widget>

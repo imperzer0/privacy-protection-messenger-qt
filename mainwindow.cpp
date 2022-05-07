@@ -4,6 +4,7 @@
 #include <execute-process-linux-defs>
 #include <QInputDialog>
 #include <arpa/inet.h>
+#include <QProxyStyle>
 
 #define CLASS_NAME_STR(class) #class
 
@@ -149,40 +150,53 @@ inline bool MainWindow::assert_data(const QString& login, const QString& passwor
 	return true;
 }
 
-void MainWindow::on_button_sign_in_clicked()
+void MainWindow::on_button_sign_up_clicked()
 {
-	QString login = this->ui->line_login->text(),
-			password = this->ui->line_pass->text();
+	QString login = this->ui->line_login_reg->text(),
+			password = this->ui->line_pass_reg->text();
 	
 	if (!assert_data(login, password)) return;
 	
-	delete backend;
-	backend = new call_backend(server_address.toStdString(), login.toStdString(), password.toStdString());
-	backend->register_user(this->ui->line_display_name->text().toStdString());
-	backend->begin_session();
+	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
+	if (!backend->register_user(this->ui->line_display_name->text().toStdString()))
+	{
+		QMessageBox::critical(
+				this, MESSAGE_BOX_TRANSLATE("Registration failed"),
+				MESSAGE_BOX_TRANSLATE("This user already exists on this server or server is compromised."));
+		return;
+	}
+	if (!backend->begin_session())
+	{
+		QMessageBox::critical(
+				this, MESSAGE_BOX_TRANSLATE("Authorisation failed"),
+				MESSAGE_BOX_TRANSLATE("You typed incorrect login or password or you are not registered yet, or server is compromised."));
+		return;
+	}
 	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(2));
+	this->ui->line_login_reg->clear();
+	this->ui->line_pass_reg->clear();
+	this->ui->line_display_name->clear();
 }
 
 
 void MainWindow::on_button_log_in_clicked()
 {
-	QString login = this->ui->line_login_2->text(),
-			password = this->ui->line_pass_2->text();
+	QString login = this->ui->line_login_log->text(),
+			password = this->ui->line_pass_log->text();
 	
 	if (!assert_data(login, password)) return;
 	
-	delete backend;
-	backend = new call_backend(server_address.toStdString(), login.toStdString(), password.toStdString());
-	if (!backend->register_user(this->ui->line_display_name->text().toStdString()))
-		QMessageBox::critical(
-				this, MESSAGE_BOX_TRANSLATE("Registration failed"),
-				MESSAGE_BOX_TRANSLATE("This user already exists on this server or server is 'deranged'.\n"
-									  "Try connect to another server or type another login."));
+	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
 	if (!backend->begin_session())
+	{
 		QMessageBox::critical(
 				this, MESSAGE_BOX_TRANSLATE("Authorisation failed"),
-				MESSAGE_BOX_TRANSLATE("You typed incorrect login or password... or server is 'deranged'."));
+				MESSAGE_BOX_TRANSLATE("You typed incorrect login or password or you are not registered yet, or server is compromised."));
+		return;
+	}
 	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(2));
+	this->ui->line_login_log->clear();
+	this->ui->line_pass_log->clear();
 }
 
 
@@ -194,7 +208,23 @@ void MainWindow::on_button_send_clicked()
 
 void MainWindow::on_search_friends_textChanged(const QString& text)
 {
-
+	this->ui->friends_list_widget->clear();
+	if (text.isEmpty())
+		return;
+	
+	std::list<std::string> result;
+	if (backend)
+		if (!backend->find_users_by_login(result, text.toStdString()))
+		{
+			QMessageBox::warning(
+					this, MESSAGE_BOX_TRANSLATE("Search failed"),
+					MESSAGE_BOX_TRANSLATE("Nothing was found or server is compromised."));
+			return;
+		}
+	
+	QIcon icon = QProxyStyle().standardIcon(QStyle::SP_ComputerIcon);
+	for (auto& e: result)
+		this->ui->friends_list_widget->addItem(new QListWidgetItem(icon, e.c_str()));
 }
 
 
@@ -219,5 +249,15 @@ void MainWindow::refresh_address_indicators()
 {
 	this->setWindowTitle("Privacy Protection Messenger (on server \"" + server_address + "\")");
 	this->ui->action_Server_address->setText(QCoreApplication::translate(CLASS_NAME_STR(MainWindow), "Server:") + " " + server_address);
+}
+
+
+void MainWindow::on_action_Logout_triggered()
+{
+	if (backend)
+	{
+		this->ui->stackedWidget->setCurrentIndex(1);
+		backend = nullptr;
+	}
 }
 

@@ -37,22 +37,24 @@ private slots:
 	
 	void on_button_not_registered_clicked();
 	
-	void on_button_sign_in_clicked();
+	void on_button_sign_up_clicked();
 	
 	void on_button_log_in_clicked();
 	
 	void on_button_send_clicked();
 	
-	void on_search_friends_textChanged(const QString& arg1);
+	void on_search_friends_textChanged(const QString&);
 	
 	void on_action_Set_server_triggered();
 	
 	void on_action_Disconnect_from_server_triggered();
 
+    void on_action_Logout_triggered();
+
 private:
 	Ui::MainWindow* ui;
 	QTranslator* m_translator = nullptr;
-	call_backend* backend = nullptr;
+	std::unique_ptr<call_backend> backend = nullptr;
 	QString server_address = "127.0.0.1";
 	
 	void refresh_address_indicators();
