@@ -48,8 +48,8 @@ private slots:
 	void on_action_Set_server_triggered();
 	
 	void on_action_Disconnect_from_server_triggered();
-
-    void on_action_Logout_triggered();
+	
+	void on_action_Logout_triggered();
 
 private:
 	Ui::MainWindow* ui;
@@ -60,6 +60,8 @@ private:
 	void refresh_address_indicators();
 	
 	inline bool assert_data(const QString& login, const QString& password);
+	
+	void switch_to_messaging();
 };
 
 #endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H

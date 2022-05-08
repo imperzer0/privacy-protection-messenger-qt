@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent), ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	this->setWindowTitle("Privacy Protection Messenger (on server \"" + server_address + "\")");
+	refresh_address_indicators();
 }
 
 MainWindow::~MainWindow()
@@ -51,7 +51,7 @@ bool MainWindow::set_language(const QString& language)
 		if (QCoreApplication::installTranslator(m_translator))
 		{
 			this->ui->retranslateUi(this);
-			this->refresh_address_indicators();
+			refresh_address_indicators();
 			return true;
 		}
 	}
@@ -61,24 +61,24 @@ bool MainWindow::set_language(const QString& language)
 
 void MainWindow::on_action_English_triggered()
 {
-	this->set_language("en_US");
+	set_language("en_US");
 }
 
 
 void MainWindow::on_action_Ukrainian_triggered()
 {
-	this->set_language("uk_UA");
+	set_language("uk_UA");
 }
 
 
 void MainWindow::on_action_Transcarpatian_triggered()
 {
-	this->set_language("ru_UA");
+	set_language("ru_UA");
 }
 
 void MainWindow::on_actionMoskalian_triggered()
 {
-	this->set_language("ru_RU");
+	set_language("ru_RU");
 }
 
 
@@ -172,7 +172,7 @@ void MainWindow::on_button_sign_up_clicked()
 				MESSAGE_BOX_TRANSLATE("You typed incorrect login or password or you are not registered yet, or server is compromised."));
 		return;
 	}
-	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(2));
+	switch_to_messaging();
 	this->ui->line_login_reg->clear();
 	this->ui->line_pass_reg->clear();
 	this->ui->line_display_name->clear();
@@ -194,7 +194,7 @@ void MainWindow::on_button_log_in_clicked()
 				MESSAGE_BOX_TRANSLATE("You typed incorrect login or password or you are not registered yet, or server is compromised."));
 		return;
 	}
-	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(2));
+	switch_to_messaging();
 	this->ui->line_login_log->clear();
 	this->ui->line_pass_log->clear();
 }
@@ -234,7 +234,7 @@ void MainWindow::on_action_Set_server_triggered()
 	if (!address.isEmpty())
 	{
 		server_address = address;
-		this->refresh_address_indicators();
+		refresh_address_indicators();
 	}
 }
 
@@ -242,12 +242,12 @@ void MainWindow::on_action_Set_server_triggered()
 void MainWindow::on_action_Disconnect_from_server_triggered()
 {
 	server_address = "";
-	this->refresh_address_indicators();
+	refresh_address_indicators();
 }
 
 void MainWindow::refresh_address_indicators()
 {
-	this->setWindowTitle("Privacy Protection Messenger (on server \"" + server_address + "\")");
+	setWindowTitle("Privacy Protection Messenger (on server \"" + server_address + "\")");
 	this->ui->action_Server_address->setText(QCoreApplication::translate(CLASS_NAME_STR(MainWindow), "Server:") + " " + server_address);
 }
 
@@ -259,5 +259,15 @@ void MainWindow::on_action_Logout_triggered()
 		this->ui->stackedWidget->setCurrentIndex(1);
 		backend = nullptr;
 	}
+}
+
+void MainWindow::switch_to_messaging()
+{
+	this->ui->stackedWidget->setCurrentWidget(this->ui->stackedWidget->widget(2));
+	this->ui->button_send->setEnabled(backend.operator bool());
+	this->ui->message_browser->setEnabled(backend.operator bool());
+	this->ui->line_message->setEnabled(backend.operator bool());
+	this->ui->search_friends->setEnabled(backend.operator bool());
+	this->ui->friends_list_widget->setEnabled(backend.operator bool());
 }
 
