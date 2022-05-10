@@ -53,13 +53,17 @@ private slots:
 
 private:
 	Ui::MainWindow* ui;
-	QTranslator* m_translator = nullptr;
+	std::unique_ptr<QTranslator> m_translator = nullptr;
 	std::unique_ptr<call_backend> backend = nullptr;
 	QString server_address = "127.0.0.1";
 	
 	void refresh_address_indicators();
 	
 	inline bool assert_data(const QString& login, const QString& password);
+	
+	void switch_to_sign_up();
+	
+	void switch_to_log_in();
 	
 	void switch_to_messaging();
 };
