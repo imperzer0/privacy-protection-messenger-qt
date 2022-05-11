@@ -5,6 +5,7 @@
 #include <QInputDialog>
 #include <arpa/inet.h>
 #include <QProxyStyle>
+#include <QPlainTextDocumentLayout>
 
 #define CLASS_NAME_STR(class) #class
 
@@ -20,6 +21,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
 	ui->setupUi(this);
 	refresh_address_indicators();
+	auto doclayout = this->ui->line_message->document()->documentLayout();
+	connect(doclayout, SIGNAL(documentSizeChanged(const QSizeF&)), this, SLOT(line_message_height_changed(const QSizeF&)));
 }
 
 MainWindow::~MainWindow()
@@ -305,5 +308,10 @@ void MainWindow::switch_to_messaging()
 	this->ui->line_message->setEnabled(backend.operator bool());
 	this->ui->search_friends->setEnabled(backend.operator bool());
 	this->ui->friends_list_widget->setEnabled(backend.operator bool());
+}
+
+void MainWindow::line_message_height_changed(const QSizeF& new_size)
+{
+	this->ui->line_message->setMinimumHeight(new_size.height());
 }
 

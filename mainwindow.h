@@ -50,6 +50,8 @@ private slots:
 	void on_action_Disconnect_from_server_triggered();
 	
 	void on_action_Logout_triggered();
+	
+	void line_message_height_changed(const QSizeF& new_size);
 
 private:
 	Ui::MainWindow* ui;
