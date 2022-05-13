@@ -13,9 +13,11 @@
 #define EMPTY_LOGIN_STR DYNAMIC_TEXT_TRANSLATE("Login must not be empty")
 #define EMPTY_PASSWORD_STR DYNAMIC_TEXT_TRANSLATE("Password must not be empty")
 #define PASSWORD_LIMIT_STR DYNAMIC_TEXT_TRANSLATE("Password must be at least 8 characters long")
-#define USER_EXISTS_STR DYNAMIC_TEXT_TRANSLATE("This user already exists on this server or server is compromised.")
-#define SESSION_NOT_STARTED_STR DYNAMIC_TEXT_TRANSLATE("You typed incorrect login or password or you are not registered yet, or server is compromised.")
-#define NOTHING_FOUND DYNAMIC_TEXT_TRANSLATE("Nothing was found or server is compromised.")
+#define USER_EXISTS_STR DYNAMIC_TEXT_TRANSLATE("This user already exists on this server.")
+#define SESSION_NOT_STARTED_STR DYNAMIC_TEXT_TRANSLATE("You typed incorrect login or password or you are not registered yet.")
+#define NOTHING_FOUND_STR DYNAMIC_TEXT_TRANSLATE("Nothing was found.")
+#define NO_ONLINE_STATUS_STR DYNAMIC_TEXT_TRANSLATE("Can not get user online status. Maybe user does not exist.")
+#define USER_OFFLINE_STR DYNAMIC_TEXT_TRANSLATE("You can't send messages to offline users.")
 
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -237,16 +239,25 @@ void MainWindow::on_button_send_clicked()
 			message.erase(message.begin());
 			if (!this->ui->line_message->toPlainText().isEmpty())
 			{
-				auto item = this->ui->friends_list_widget->currentItem();
-				if (item)
+				auto current_user = this->ui->label_current_user->text();
+				if (!current_user.isEmpty())
 				{
-					if (backend->send_message(
-							item->text().toStdString(),
-							std::vector<uint8_t>{message.begin(), message.end()}
-					))
+					bool online = false;
+					if (!backend->check_online_status(online, current_user.toStdString()))
 					{
-						this->ui->line_message->clear();
+						QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Can't obtain online status"), NO_ONLINE_STATUS_STR);
+						return;
 					}
+					
+					if (online)
+					{
+						if (backend->send_message(
+								current_user.toStdString(),
+								std::vector<uint8_t>{message.begin(), message.end()}
+						))
+							this->ui->line_message->clear();
+					}
+					else QMessageBox::warning(this, DYNAMIC_TEXT_TRANSLATE("User is offline"), USER_OFFLINE_STR);
 				}
 			}
 			return;
@@ -266,7 +277,7 @@ void MainWindow::on_search_friends_textChanged(const QString& text)
 	if (backend)
 		if (!backend->find_users_by_login(result, text.toStdString()))
 		{
-			QMessageBox::warning(this, DYNAMIC_TEXT_TRANSLATE("Search failed"), NOTHING_FOUND);
+			QMessageBox::warning(this, DYNAMIC_TEXT_TRANSLATE("Search failed"), NOTHING_FOUND_STR);
 			return;
 		}
 	
@@ -350,5 +361,27 @@ void MainWindow::switch_to_messaging()
 void MainWindow::line_message_height_changed(const QSizeF& new_size)
 {
 	this->ui->line_message->setMinimumHeight(new_size.height());
+}
+
+
+void MainWindow::on_friends_list_widget_itemActivated(QListWidgetItem* item)
+{
+	bool online = false;
+	backend->check_online_status(online, item->text().toStdString());
+	this->ui->label_online_status->setText(online ? "[online]" : "[offline]");
+	this->ui->label_online_status->setStyleSheet(
+			online ?
+			"color: rgb(81, 255, 0);\n"
+			"background-color: rgb(112, 62, 0);\n"
+			"margin-left: 50;\n"
+			"margin-right: 50;\n"
+			"padding: 2;" :
+			"color: rgb(255, 42, 92);\n"
+			"background-color: rgb(112, 62, 0);\n"
+			"margin-left: 50;\n"
+			"margin-right: 50;\n"
+			"padding: 2;"
+	);
+	this->ui->label_current_user->setText(item->text());
 }
 

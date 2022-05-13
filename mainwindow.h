@@ -8,6 +8,7 @@
 #include <QProxyStyle>
 #include <QPlainTextDocumentLayout>
 #include <QtXml/QtXml>
+#include <QListWidgetItem>
 #include <memory>
 #include <arpa/inet.h>
 #include <string>
@@ -60,6 +61,8 @@ private slots:
 	void on_action_Logout_triggered();
 	
 	void line_message_height_changed(const QSizeF& new_size);
+
+    void on_friends_list_widget_itemActivated(QListWidgetItem *item);
 
 private:
 	Ui::MainWindow* ui;

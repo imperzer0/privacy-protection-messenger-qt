@@ -779,6 +779,23 @@ color: #e9eeee;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
+            <widget class="QLabel" name="label_online_status">
+             <property name="styleSheet">
+              <string notr="true">color: rgb(255, 42, 92);
+background-color: rgb(112, 62, 0);
+margin-left: 50;
+margin-right: 50;
+padding: 2;</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QLineEdit" name="search_friends">
              <property name="enabled">
               <bool>true</bool>
@@ -841,11 +858,11 @@ padding: 0.25em;
           <property name="title">
            <string/>
           </property>
-          <layout class="QGridLayout" name="gridLayout_chatBox" rowstretch="0,0" columnstretch="0,0" rowminimumheight="0,0">
+          <layout class="QGridLayout" name="gridLayout_chatBox" rowstretch="0,0,0" columnstretch="0,0" rowminimumheight="0,0,0">
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
-           <item row="1" column="0">
+           <item row="2" column="0">
             <widget class="QTextEdit" name="line_message">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -884,7 +901,7 @@ hr { height: 1px; border-width: 0; }
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="2" column="1">
             <widget class="QPushButton" name="button_send">
              <property name="enabled">
               <bool>true</bool>
@@ -921,7 +938,7 @@ hr { height: 1px; border-width: 0; }
              </property>
             </widget>
            </item>
-           <item row="0" column="0" colspan="2">
+           <item row="1" column="0" colspan="2">
             <widget class="QTextBrowser" name="message_browser">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -939,6 +956,31 @@ hr { height: 1px; border-width: 0; }
               <font>
                <pointsize>12</pointsize>
               </font>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_current_user">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: qconicalgradient(cx:0.494305, cy:0.761, angle:34.8, stop:0 rgba(255, 213, 0, 255), stop:0.106952 rgba(255, 255, 255, 255), stop:0.262032 rgba(0, 255, 17, 255), stop:0.465241 rgba(0, 209, 255, 255), stop:0.59893 rgba(106, 234, 255, 255), stop:0.636364 rgba(255, 74, 225, 255), stop:0.818182 rgba(247, 11, 11, 255), stop:1 rgba(255, 233, 0, 255));
+color: black;
+font: 700 12pt &quot;Consolas for Powerline&quot;;
+padding: 1px;</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="margin">
+              <number>0</number>
              </property>
             </widget>
            </item>
