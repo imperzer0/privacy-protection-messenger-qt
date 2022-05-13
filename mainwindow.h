@@ -3,6 +3,13 @@
 
 #include <QMainWindow>
 #include <QTranslator>
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QProxyStyle>
+#include <QPlainTextDocumentLayout>
+#include <memory>
+#include <arpa/inet.h>
+#include <string>
 #include "call_backend.hpp"
 
 QT_BEGIN_NAMESPACE

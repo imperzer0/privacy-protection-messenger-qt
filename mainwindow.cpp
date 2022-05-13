@@ -1,14 +1,7 @@
-#include <QMessageBox>
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include <execute-process-linux-defs>
-#include <QInputDialog>
-#include <arpa/inet.h>
-#include <QProxyStyle>
-#include <QPlainTextDocumentLayout>
 
 #define CLASS_NAME_STR(class) #class
-
 #define DYNAMIC_TEXT_TRANSLATE(str) QCoreApplication::translate("HardcodedString", str)
 
 #define INVALID_CREDENTIALS_TITLE DYNAMIC_TEXT_TRANSLATE("Invalid credentials!")
@@ -16,6 +9,14 @@
 #define ASK_FOR_SERVER_TITLE DYNAMIC_TEXT_TRANSLATE("Enter server address")
 #define SERVER_COLON_STR DYNAMIC_TEXT_TRANSLATE("Server:")
 #define ON_SERVER_STR DYNAMIC_TEXT_TRANSLATE("on server")
+#define INVALID_SERVER_IP_STR DYNAMIC_TEXT_TRANSLATE("Invalid server IP")
+#define EMPTY_LOGIN_STR DYNAMIC_TEXT_TRANSLATE("Login must not be empty")
+#define EMPTY_PASSWORD_STR DYNAMIC_TEXT_TRANSLATE("Password must not be empty")
+#define PASSWORD_LIMIT_STR DYNAMIC_TEXT_TRANSLATE("Password must be at least 8 characters long")
+#define USER_EXISTS_STR DYNAMIC_TEXT_TRANSLATE("This user already exists on this server or server is compromised.")
+#define SESSION_NOT_STARTED_STR DYNAMIC_TEXT_TRANSLATE("You typed incorrect login or password or you are not registered yet, or server is compromised.")
+#define NOTHING_FOUND DYNAMIC_TEXT_TRANSLATE("Nothing was found or server is compromised.")
+
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -129,25 +130,25 @@ inline bool MainWindow::assert_data(const QString& login, const QString& passwor
 {
 	if (!validate_ip(server_address.toStdString()))
 	{
-		QMessageBox::critical(this, INVALID_SERVER_TITLE, DYNAMIC_TEXT_TRANSLATE("Invalid ip address") + " \"" + server_address + "\"");
+		QMessageBox::critical(this, INVALID_SERVER_TITLE, INVALID_SERVER_IP_STR + " \"" + server_address + "\"");
 		return false;
 	}
 	
 	if (login.isEmpty())
 	{
-		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, DYNAMIC_TEXT_TRANSLATE("Login must not be empty"));
+		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, EMPTY_LOGIN_STR);
 		return false;
 	}
 	
 	if (password.isEmpty())
 	{
-		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, DYNAMIC_TEXT_TRANSLATE("Password must not be empty"));
+		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, EMPTY_PASSWORD_STR);
 		return false;
 	}
 	
 	if (password.size() < 8)
 	{
-		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, DYNAMIC_TEXT_TRANSLATE("Password must be at least 8 characters long"));
+		QMessageBox::critical(this, INVALID_CREDENTIALS_TITLE, PASSWORD_LIMIT_STR);
 		return false;
 	}
 	
@@ -164,19 +165,13 @@ void MainWindow::on_button_sign_up_clicked()
 	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
 	if (!backend->register_user(this->ui->line_display_name->text().toStdString()))
 	{
-		QMessageBox::critical(
-				this, DYNAMIC_TEXT_TRANSLATE("Registration failed"),
-				DYNAMIC_TEXT_TRANSLATE("This user already exists on this server or server is compromised.")
-		);
+		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Registration failed"), USER_EXISTS_STR);
 		backend = nullptr;
 		return;
 	}
 	if (!backend->begin_session())
 	{
-		QMessageBox::critical(
-				this, DYNAMIC_TEXT_TRANSLATE("Authorisation failed"),
-				DYNAMIC_TEXT_TRANSLATE("You typed incorrect login or password or you are not registered yet, or server is compromised.")
-		);
+		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Authorisation failed"), SESSION_NOT_STARTED_STR);
 		backend = nullptr;
 		return;
 	}
@@ -197,10 +192,7 @@ void MainWindow::on_button_log_in_clicked()
 	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
 	if (!backend->begin_session())
 	{
-		QMessageBox::critical(
-				this, DYNAMIC_TEXT_TRANSLATE("Authorisation failed"),
-				DYNAMIC_TEXT_TRANSLATE("You typed incorrect login or password or you are not registered yet, or server is compromised.")
-		);
+		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Authorisation failed"), SESSION_NOT_STARTED_STR);
 		backend = nullptr;
 		return;
 	}
@@ -226,10 +218,7 @@ void MainWindow::on_search_friends_textChanged(const QString& text)
 	if (backend)
 		if (!backend->find_users_by_login(result, text.toStdString()))
 		{
-			QMessageBox::warning(
-					this, DYNAMIC_TEXT_TRANSLATE("Search failed"),
-					DYNAMIC_TEXT_TRANSLATE("Nothing was found or server is compromised.")
-			);
+			QMessageBox::warning(this, DYNAMIC_TEXT_TRANSLATE("Search failed"), NOTHING_FOUND);
 			return;
 		}
 	

@@ -969,7 +969,7 @@ hr { height: 1px; border-width: 0; }
     <addaction name="action_Transcarpatian"/>
     <addaction name="actionMoskalian"/>
    </widget>
-   <widget class="QMenu" name="menuServer">
+   <widget class="QMenu" name="menu_Server">
     <property name="title">
      <string>Server</string>
     </property>
@@ -977,14 +977,14 @@ hr { height: 1px; border-width: 0; }
     <addaction name="action_Disconnect_from_server"/>
     <addaction name="action_Server_address"/>
    </widget>
-   <widget class="QMenu" name="menuSettings">
+   <widget class="QMenu" name="menu_Action">
     <property name="title">
-     <string>Settings</string>
+     <string>Action</string>
     </property>
     <addaction name="action_Logout"/>
    </widget>
-   <addaction name="menuSettings"/>
-   <addaction name="menuServer"/>
+   <addaction name="menu_Action"/>
+   <addaction name="menu_Server"/>
    <addaction name="menu_Language"/>
   </widget>
   <action name="action_English">
