@@ -7,6 +7,7 @@
 #include <QInputDialog>
 #include <QProxyStyle>
 #include <QPlainTextDocumentLayout>
+#include <QtXml/QtXml>
 #include <memory>
 #include <arpa/inet.h>
 #include <string>
@@ -75,6 +76,8 @@ private:
 	void switch_to_log_in();
 	
 	void switch_to_messaging();
+	
+	void remove_all_attributes(QDomElement& node);
 };
 
 #endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H

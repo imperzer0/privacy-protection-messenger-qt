@@ -202,9 +202,57 @@ void MainWindow::on_button_log_in_clicked()
 }
 
 
+void MainWindow::remove_all_attributes(QDomElement& element)
+{
+	auto attrs = element.attributes();
+	for (int i = 0; i < attrs.size(); ++i)
+		element.removeAttribute(attrs.item(i).nodeName());
+	auto n = element.firstChild();
+	while (!n.isNull())
+	{
+		auto e = n.toElement();
+		if (!e.isNull()) remove_all_attributes(e);
+		n = n.nextSibling();
+	}
+}
+
 void MainWindow::on_button_send_clicked()
 {
-	/// TODO: message sending procedure
+	QDomDocument doc("message");
+	doc.setContent(this->ui->line_message->toHtml());
+	auto element = doc.documentElement();
+	auto n = element.firstChild();
+	while (!n.isNull())
+	{
+		auto e = n.toElement();
+		if (!e.isNull() && e.nodeName() == "body")
+		{
+			QString str;
+			QTextStream stream(&str, QTextStream::WriteOnly);
+			remove_all_attributes(e);
+			e.setTagName("div");
+			e.save(stream, 1);
+			str.replace("\n ", "\n");
+			auto message = str.toStdString();
+			message.erase(message.begin());
+			if (!this->ui->line_message->toPlainText().isEmpty())
+			{
+				auto item = this->ui->friends_list_widget->currentItem();
+				if (item)
+				{
+					if (backend->send_message(
+							item->text().toStdString(),
+							std::vector<uint8_t>{message.begin(), message.end()}
+					))
+					{
+						this->ui->line_message->clear();
+					}
+				}
+			}
+			return;
+		}
+		n = n.nextSibling();
+	}
 }
 
 

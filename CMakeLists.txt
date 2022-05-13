@@ -16,8 +16,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
 
 message("CMAKE generator - ${CMAKE_GENERATOR}")
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Xml LinguistTools REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml LinguistTools REQUIRED)
 
 set(TRANSLATIONS privacy-protection-messenger-qt_uk_UA privacy-protection-messenger-qt_ru_UA
         privacy-protection-messenger-qt_ru_RU)
@@ -78,7 +78,9 @@ else ()
     endif ()
 endif ()
 
-target_link_libraries(privacy-protection-messenger-qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(privacy-protection-messenger-qt PRIVATE
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Xml)
 
 set_target_properties(privacy-protection-messenger-qt PROPERTIES
         MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
