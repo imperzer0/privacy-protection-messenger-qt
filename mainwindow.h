@@ -61,8 +61,8 @@ private slots:
 	void on_action_Logout_triggered();
 	
 	void line_message_height_changed(const QSizeF& new_size);
-
-    void on_friends_list_widget_itemActivated(QListWidgetItem *item);
+	
+	void on_friends_list_widget_itemActivated(QListWidgetItem* item);
 
 private:
 	Ui::MainWindow* ui;
@@ -81,6 +81,12 @@ private:
 	void switch_to_messaging();
 	
 	void remove_all_attributes(QDomElement& node);
+	
+	void insert_mine_message_into_history(const std::string& msg);
+	
+	void insert_extraneous_message_into_history(const std::string& msg, const std::string& username);
+	
+	void insert_message_into_history(const std::string& msg, const std::string& username, const std::string& border_color, const std::string& align);
 };
 
 #endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H

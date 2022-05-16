@@ -18,6 +18,7 @@
 #define NOTHING_FOUND_STR DYNAMIC_TEXT_TRANSLATE("Nothing was found.")
 #define NO_ONLINE_STATUS_STR DYNAMIC_TEXT_TRANSLATE("Can not get user online status. Maybe user does not exist.")
 #define USER_OFFLINE_STR DYNAMIC_TEXT_TRANSLATE("You can't send messages to offline users.")
+#define NO_USER_SEL_STR DYNAMIC_TEXT_TRANSLATE("First select user for conversation.")
 
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -221,49 +222,107 @@ void MainWindow::remove_all_attributes(QDomElement& element)
 void MainWindow::on_button_send_clicked()
 {
 	QDomDocument doc("message");
-	doc.setContent(this->ui->line_message->toHtml());
-	auto element = doc.documentElement();
-	auto n = element.firstChild();
+	auto msg_text = this->ui->line_message->toPlainText();
+	if (!msg_text.isEmpty())
+	{
+		while (msg_text.back() == '\n') msg_text.chop(1);
+		msg_text.replace("\n", "<br/>");
+		auto message = msg_text.toStdString();
+		auto current_user = this->ui->label_current_user->text();
+		if (!current_user.isEmpty())
+		{
+			bool online = false;
+			if (!backend->check_online_status(online, current_user.toStdString()))
+			{
+				QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Can't obtain online status"), NO_ONLINE_STATUS_STR);
+				return;
+			}
+			
+			if (online)
+			{
+				if (backend->send_message(
+						current_user.toStdString(),
+						std::vector<uint8_t>{message.begin(), message.end()}
+				))
+				{
+					this->ui->line_message->clear();
+					insert_mine_message_into_history(message);
+				}
+			}
+			else QMessageBox::warning(this, DYNAMIC_TEXT_TRANSLATE("User is offline"), USER_OFFLINE_STR);
+		}
+		else QMessageBox::warning(this, DYNAMIC_TEXT_TRANSLATE("No user selected"), NO_USER_SEL_STR);
+	}
+}
+
+void MainWindow::insert_mine_message_into_history(const std::string& msg)
+{
+	insert_message_into_history(msg, "You", "yellow", "right");
+}
+
+void MainWindow::insert_extraneous_message_into_history(const std::string& msg, const std::string& username)
+{
+	insert_message_into_history(msg, username, "rgb(12, 120, 255)", "left");
+}
+
+void MainWindow::insert_message_into_history(
+		const std::string& msg, const std::string& username, const std::string& border_color, const std::string& align)
+{
+	QDomDocument message("msg");
+	message.setContent(
+			QString{
+					("<table><tr><td>" + username + "</td></tr><tr><td><pre>" + msg + "</pre></td></tr></table>")
+							.c_str()
+			}
+	);
+	auto me = message.documentElement();
+	me.setAttribute("cellspacing", "0");
+	me.setAttribute("cellpadding", "5");
+	me.setAttribute("align", align.c_str());
+	me.setAttribute("style", ("margin: 6px; background-color: rgb(30, 22, 1); border-width: 2px; border-color: " + border_color + ";").c_str());
+	
+	QDomDocument history("history");
+	history.setContent(this->ui->message_browser->toHtml());
+	auto he = history.documentElement();
+	auto n = he.firstChild();
 	while (!n.isNull())
 	{
 		auto e = n.toElement();
 		if (!e.isNull() && e.nodeName() == "body")
 		{
-			QString str;
-			QTextStream stream(&str, QTextStream::WriteOnly);
-			remove_all_attributes(e);
-			e.setTagName("div");
-			e.save(stream, 1);
-			str.replace("\n ", "\n");
-			auto message = str.toStdString();
-			message.erase(message.begin());
-			if (!this->ui->line_message->toPlainText().isEmpty())
-			{
-				auto current_user = this->ui->label_current_user->text();
-				if (!current_user.isEmpty())
-				{
-					bool online = false;
-					if (!backend->check_online_status(online, current_user.toStdString()))
-					{
-						QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Can't obtain online status"), NO_ONLINE_STATUS_STR);
-						return;
-					}
-					
-					if (online)
-					{
-						if (backend->send_message(
-								current_user.toStdString(),
-								std::vector<uint8_t>{message.begin(), message.end()}
-						))
-							this->ui->line_message->clear();
-					}
-					else QMessageBox::warning(this, DYNAMIC_TEXT_TRANSLATE("User is offline"), USER_OFFLINE_STR);
-				}
-			}
-			return;
+			e.insertAfter(me, e.lastChild());
+			break;
 		}
 		n = n.nextSibling();
 	}
+	
+	QString exported_history;
+	{
+		QTextStream stream(&exported_history);
+		history.save(stream, 0);
+	}
+	this->ui->message_browser->setHtml(exported_history);
+}
+
+void MainWindow::on_friends_list_widget_itemActivated(QListWidgetItem* item)
+{
+	bool online = false;
+	backend->check_online_status(online, item->text().toStdString());
+	this->ui->label_online_status->setText(online ? "[online]" : "[offline]");
+	this->ui->label_online_status->setStyleSheet(
+			online ?
+			"color: rgb(81, 255, 0);\n"
+			"background-color: rgb(112, 62, 0);\n"
+			"margin-left: 50;\n"
+			"margin-right: 50;\n"
+			"padding: 2;" :
+			"color: rgb(255, 42, 92);\n"
+			"background-color: rgb(112, 62, 0);\n"
+			"margin-left: 50;\n"
+			"margin-right: 50;\n"
+			"padding: 2;"
+	);
+	this->ui->label_current_user->setText(item->text());
 }
 
 
@@ -315,8 +374,8 @@ void MainWindow::on_action_Logout_triggered()
 {
 	if (backend)
 	{
-		switch_to_log_in();
 		backend = nullptr;
+		switch_to_log_in();
 	}
 }
 
@@ -361,27 +420,5 @@ void MainWindow::switch_to_messaging()
 void MainWindow::line_message_height_changed(const QSizeF& new_size)
 {
 	this->ui->line_message->setMinimumHeight(new_size.height());
-}
-
-
-void MainWindow::on_friends_list_widget_itemActivated(QListWidgetItem* item)
-{
-	bool online = false;
-	backend->check_online_status(online, item->text().toStdString());
-	this->ui->label_online_status->setText(online ? "[online]" : "[offline]");
-	this->ui->label_online_status->setStyleSheet(
-			online ?
-			"color: rgb(81, 255, 0);\n"
-			"background-color: rgb(112, 62, 0);\n"
-			"margin-left: 50;\n"
-			"margin-right: 50;\n"
-			"padding: 2;" :
-			"color: rgb(255, 42, 92);\n"
-			"background-color: rgb(112, 62, 0);\n"
-			"margin-left: 50;\n"
-			"margin-right: 50;\n"
-			"padding: 2;"
-	);
-	this->ui->label_current_user->setText(item->text());
 }
 

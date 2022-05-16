@@ -1,5 +1,5 @@
 pkgname="privacy-protection-messenger-qt"
-pkgver=1.1
+pkgver=2.0
 pkgrel=0
 pkgdesc="Privacy Protection Messenger Qt GUI"
 author="imperzer0"
@@ -12,7 +12,7 @@ makedepends=("cmake>=3.0" "qt6-base")
 _srcprefix="local:/"
 _languages=("uk_UA" "ru_UA" "ru_RU")
 _libfiles=("CMakeLists.txt" "main.cpp" "mainwindow.cpp" "mainwindow.h" "call_backend.hpp"
-          "mainwindow.ui" "resources.qrc")
+          "mainwindow.ui" "resources.qrc" "$pkgname.desktop")
 
 for _lang in ${_languages[@]}
 {
@@ -38,10 +38,13 @@ build()
 package()
 {
 	install -Dm755 $pkgname "$pkgdir/usr/bin/$pkgname"
+	install -Dm755 "$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname"
 }
 
 notarch_package()
 {
 	cp -f $pkgname "$pkgdir/usr/bin/$pkgname"
 	chmod 755 "$pkgdir/usr/bin/$pkgname"
+	cp -f "$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname"
+	chmod 755 "$pkgdir/usr/share/applications/$pkgname.desktop"
 }

@@ -400,6 +400,11 @@ public:
 		::close(op[exec::pipe::read]);
 		return res;
 	}
+	
+	const std::string& my_login()
+	{
+		return login;
+	}
 
 private:
 	std::string address;
