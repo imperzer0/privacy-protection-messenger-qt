@@ -1,6 +1,6 @@
 pkgname="privacy-protection-messenger-qt"
 pkgver=2.0
-pkgrel=0
+pkgrel=1
 pkgdesc="Privacy Protection Messenger Qt GUI"
 author="imperzer0"
 url="https://github.com/$author/$pkgname"
@@ -38,13 +38,13 @@ build()
 package()
 {
 	install -Dm755 $pkgname "$pkgdir/usr/bin/$pkgname"
-	install -Dm755 "$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname"
+	install -Dm755 "$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname.desktop"
 }
 
 notarch_package()
 {
 	cp -f $pkgname "$pkgdir/usr/bin/$pkgname"
 	chmod 755 "$pkgdir/usr/bin/$pkgname"
-	cp -f "$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname"
+	cp -f "$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname.desktop"
 	chmod 755 "$pkgdir/usr/share/applications/$pkgname.desktop"
 }
