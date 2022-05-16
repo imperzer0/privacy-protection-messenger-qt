@@ -1,5 +1,5 @@
 pkgname="privacy-protection-messenger-qt"
-pkgver=2.0
+pkgver=2.1
 pkgrel=1
 pkgdesc="Privacy Protection Messenger Qt GUI"
 author="imperzer0"

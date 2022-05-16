@@ -231,16 +231,17 @@ void MainWindow::on_button_send_clicked()
 		auto current_user = this->ui->label_current_user->text();
 		if (!current_user.isEmpty())
 		{
+			bool self_send = backend->my_login() == current_user.toStdString();
 			bool online = false;
-			if (!backend->check_online_status(online, current_user.toStdString()))
+			if (!self_send && !backend->check_online_status(online, current_user.toStdString()))
 			{
 				QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Can't obtain online status"), NO_ONLINE_STATUS_STR);
 				return;
 			}
 			
-			if (online)
+			if (self_send || online)
 			{
-				if (backend->send_message(
+				if (self_send || backend->send_message(
 						current_user.toStdString(),
 						std::vector<uint8_t>{message.begin(), message.end()}
 				))
