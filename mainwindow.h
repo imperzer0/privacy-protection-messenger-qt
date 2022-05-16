@@ -52,8 +52,6 @@ private slots:
 	
 	void on_button_send_clicked();
 	
-	void on_search_friends_textChanged(const QString&);
-	
 	void on_action_Set_server_triggered();
 	
 	void on_action_Disconnect_from_server_triggered();
@@ -63,6 +61,12 @@ private slots:
 	void line_message_height_changed(const QSizeF& new_size);
 	
 	void on_friends_list_widget_itemActivated(QListWidgetItem* item);
+	
+	void on_line_display_name_returnPressed();
+	
+	void on_line_pass_log_returnPressed();
+	
+	void on_search_friends_returnPressed();
 
 private:
 	Ui::MainWindow* ui;
@@ -87,6 +91,10 @@ private:
 	void insert_extraneous_message_into_history(const std::string& msg, const std::string& username);
 	
 	void insert_message_into_history(const std::string& msg, const std::string& username, const std::string& border_color, const std::string& align);
+	
+	void log_in();
+	
+	void sign_up();
 };
 
 #endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H

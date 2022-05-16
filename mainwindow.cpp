@@ -160,48 +160,13 @@ inline bool MainWindow::assert_data(const QString& login, const QString& passwor
 
 void MainWindow::on_button_sign_up_clicked()
 {
-	QString login = this->ui->line_login_reg->text(),
-			password = this->ui->line_pass_reg->text();
-	
-	if (!assert_data(login, password)) return;
-	
-	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
-	if (!backend->register_user(this->ui->line_display_name->text().toStdString()))
-	{
-		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Registration failed"), USER_EXISTS_STR);
-		backend = nullptr;
-		return;
-	}
-	if (!backend->begin_session())
-	{
-		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Authorisation failed"), SESSION_NOT_STARTED_STR);
-		backend = nullptr;
-		return;
-	}
-	switch_to_messaging();
-	this->ui->line_login_reg->clear();
-	this->ui->line_pass_reg->clear();
-	this->ui->line_display_name->clear();
+	sign_up();
 }
 
 
 void MainWindow::on_button_log_in_clicked()
 {
-	QString login = this->ui->line_login_log->text(),
-			password = this->ui->line_pass_log->text();
-	
-	if (!assert_data(login, password)) return;
-	
-	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
-	if (!backend->begin_session())
-	{
-		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Authorisation failed"), SESSION_NOT_STARTED_STR);
-		backend = nullptr;
-		return;
-	}
-	switch_to_messaging();
-	this->ui->line_login_log->clear();
-	this->ui->line_pass_log->clear();
+	log_in();
 }
 
 
@@ -326,27 +291,6 @@ void MainWindow::on_friends_list_widget_itemActivated(QListWidgetItem* item)
 	this->ui->label_current_user->setText(item->text());
 }
 
-
-void MainWindow::on_search_friends_textChanged(const QString& text)
-{
-	this->ui->friends_list_widget->clear();
-	if (text.isEmpty())
-		return;
-	
-	std::list<std::string> result;
-	if (backend)
-		if (!backend->find_users_by_login(result, text.toStdString()))
-		{
-			QMessageBox::warning(this, DYNAMIC_TEXT_TRANSLATE("Search failed"), NOTHING_FOUND_STR);
-			return;
-		}
-	
-	QIcon icon = QProxyStyle().standardIcon(QStyle::SP_ComputerIcon);
-	for (auto& e: result)
-		this->ui->friends_list_widget->addItem(new QListWidgetItem(icon, e.c_str()));
-}
-
-
 void MainWindow::on_action_Set_server_triggered()
 {
 	auto address = QInputDialog::getText(this, ASK_FOR_SERVER_TITLE, SERVER_COLON_STR);
@@ -423,3 +367,80 @@ void MainWindow::line_message_height_changed(const QSizeF& new_size)
 	this->ui->line_message->setMinimumHeight(new_size.height());
 }
 
+
+void MainWindow::on_line_display_name_returnPressed()
+{
+	sign_up();
+}
+
+void MainWindow::on_line_pass_log_returnPressed()
+{
+	log_in();
+}
+
+void MainWindow::on_search_friends_returnPressed()
+{
+	this->ui->friends_list_widget->clear();
+	auto text = this->ui->search_friends->text();
+	if (text.isEmpty())
+		return;
+	
+	std::list<std::string> result;
+	if (backend)
+		if (!backend->find_users_by_login(result, text.toStdString()))
+		{
+			QMessageBox::warning(this, DYNAMIC_TEXT_TRANSLATE("Search failed"), NOTHING_FOUND_STR);
+			return;
+		}
+	
+	QIcon icon = QProxyStyle().standardIcon(QStyle::SP_ComputerIcon);
+	for (auto& e: result)
+		this->ui->friends_list_widget->addItem(new QListWidgetItem(icon, e.c_str()));
+}
+
+
+void MainWindow::sign_up()
+{
+	QString login = this->ui->line_login_reg->text(),
+			password = this->ui->line_pass_reg->text();
+	
+	if (!assert_data(login, password)) return;
+	
+	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
+	if (!backend->register_user(this->ui->line_display_name->text().toStdString()))
+	{
+		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Registration failed"), USER_EXISTS_STR);
+		backend = nullptr;
+		return;
+	}
+	if (!backend->begin_session())
+	{
+		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Authorisation failed"), SESSION_NOT_STARTED_STR);
+		backend = nullptr;
+		return;
+	}
+	switch_to_messaging();
+	this->ui->line_login_reg->clear();
+	this->ui->line_pass_reg->clear();
+	this->ui->line_display_name->clear();
+}
+
+
+void MainWindow::log_in()
+{
+	QString login = this->ui->line_login_log->text(),
+			password = this->ui->line_pass_log->text();
+	
+	if (!assert_data(login, password)) return;
+	
+	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
+	if (!backend->begin_session())
+	{
+		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Authorisation failed"), SESSION_NOT_STARTED_STR);
+		backend = nullptr;
+		return;
+	}
+	switch_to_messaging();
+	this->ui->line_login_log->clear();
+	this->ui->line_pass_log->clear();
+}

@@ -1,6 +1,6 @@
 pkgname="privacy-protection-messenger-qt"
-pkgver=2.1
-pkgrel=1
+pkgver=2.2
+pkgrel=0
 pkgdesc="Privacy Protection Messenger Qt GUI"
 author="imperzer0"
 url="https://github.com/$author/$pkgname"
