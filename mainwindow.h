@@ -21,6 +21,8 @@ namespace Ui
 }
 QT_END_NAMESPACE
 
+class poll_incoming_msg_thread;
+
 class MainWindow : public QMainWindow
 {
 Q_OBJECT
@@ -77,6 +79,7 @@ private:
 	std::unique_ptr<QTranslator> m_translator = nullptr;
 	std::unique_ptr<call_backend> backend = nullptr;
 	QString server_address = "127.0.0.1";
+	std::unique_ptr<poll_incoming_msg_thread> thread = nullptr;
 	
 	void refresh_address_indicators();
 	

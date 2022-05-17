@@ -21,9 +21,9 @@
 #define NO_USER_SEL_STR DYNAMIC_TEXT_TRANSLATE("First select user for conversation.")
 
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget* parent)
+		: QMainWindow(parent), ui(new Ui::MainWindow), thread(std::make_unique<poll_incoming_msg_thread>(this))
 {
-	QThread* thread = new poll_incoming_msg_thread(this);
 	thread->start(QThread::LowestPriority);
 	ui->setupUi(this);
 	refresh_address_indicators();
