@@ -1,17 +1,14 @@
 [Desktop Entry]
 Categories=Qt;Privacy;Messenger;Internet;Security;
 Comment=Private and anonymous messenger
-Comment=Private and anonymous messenger
 Comment[en_GB]=Private and anonymous messenger
 Comment[ru]=Маскалю на ножі
 Comment[uk]=Приватний та анонімний месенджер
 Comment[x-test]=xxPrivate and anonymous messengerxx
 Exec=privacy-protection-messenger-qt
 GenericName=Privacy Protection Messenger
-GenericName=Privacy Protection Messenger
-Icon=dialog-messages
+Icon=/usr/share/icons/privacy-protection-messenger-qt/icon.svg
 MimeType=
-Name=Privacy Protection Messenger
 Name=Privacy Protection Messenger
 Path=
 SingleMainWindow=true
