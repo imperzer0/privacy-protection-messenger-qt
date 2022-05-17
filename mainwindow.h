@@ -67,6 +67,10 @@ private slots:
 	void on_line_pass_log_returnPressed();
 	
 	void on_search_friends_returnPressed();
+	
+	void insert_mine_message_into_history(const std::string& msg);
+	
+	void insert_extraneous_message_into_history(const std::string& msg, const std::string& username);
 
 private:
 	Ui::MainWindow* ui;
@@ -86,15 +90,33 @@ private:
 	
 	void remove_all_attributes(QDomElement& node);
 	
-	void insert_mine_message_into_history(const std::string& msg);
-	
-	void insert_extraneous_message_into_history(const std::string& msg, const std::string& username);
-	
 	void insert_message_into_history(const std::string& msg, const std::string& username, const std::string& border_color, const std::string& align);
 	
 	void log_in();
 	
 	void sign_up();
+
+private:
+	friend class poll_incoming_msg_thread;
+};
+
+
+class poll_incoming_msg_thread : public QThread
+{
+Q_OBJECT
+
+public:
+	poll_incoming_msg_thread(MainWindow* main_window);
+
+signals:
+	
+	void append_message_to_history(const std::string&, const std::string&);
+
+protected:
+	[[noreturn]] void run() override;
+
+private:
+	MainWindow* main_window;
 };
 
 #endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H

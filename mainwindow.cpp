@@ -23,6 +23,8 @@
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+	QThread* thread = new poll_incoming_msg_thread(this);
+	thread->start(QThread::LowestPriority);
 	ui->setupUi(this);
 	refresh_address_indicators();
 	auto doclayout = this->ui->line_message->document()->documentLayout();
@@ -443,4 +445,32 @@ void MainWindow::log_in()
 	switch_to_messaging();
 	this->ui->line_login_log->clear();
 	this->ui->line_pass_log->clear();
+}
+
+
+poll_incoming_msg_thread::poll_incoming_msg_thread(MainWindow* main_window) : main_window(main_window)
+{
+	connect(
+			this, &poll_incoming_msg_thread::append_message_to_history,
+			main_window, &MainWindow::insert_extraneous_message_into_history
+	);
+}
+
+[[noreturn]] void poll_incoming_msg_thread::run()
+{
+	while (true)
+	{
+		if (main_window->backend)
+		{
+			std::string user;
+			std::vector<uint8_t> message;
+			if (main_window->backend->query_incoming(user, message))
+			{
+				emit append_message_to_history({message.begin(), message.end()}, user);
+				::usleep(50000);
+			}
+			else ::sleep(1);
+		}
+		else ::sleep(1);
+	}
 }
