@@ -12,6 +12,7 @@
 #include <memory>
 #include <arpa/inet.h>
 #include <string>
+#include <xor-crypt>
 #include "call_backend.hpp"
 
 QT_BEGIN_NAMESPACE
@@ -22,6 +23,8 @@ namespace Ui
 QT_END_NAMESPACE
 
 class poll_incoming_msg_thread;
+
+class switch_performer;
 
 class MainWindow : public QMainWindow
 {
@@ -80,16 +83,11 @@ private:
 	std::unique_ptr<call_backend> backend = nullptr;
 	QString server_address = "127.0.0.1";
 	std::unique_ptr<poll_incoming_msg_thread> thread = nullptr;
+	std::unique_ptr<switch_performer> current_page = std::make_unique<switch_performer>(this);
 	
 	void refresh_address_indicators();
 	
 	inline bool assert_data(const QString& login, const QString& password);
-	
-	void switch_to_sign_up();
-	
-	void switch_to_log_in();
-	
-	void switch_to_messaging();
 	
 	void remove_all_attributes(QDomElement& node);
 	
@@ -101,6 +99,14 @@ private:
 
 private:
 	friend class poll_incoming_msg_thread;
+	
+	friend class switcher;
+	
+	friend class signup;
+	
+	friend class login;
+	
+	friend class chat;
 };
 
 
@@ -110,16 +116,79 @@ Q_OBJECT
 
 public:
 	poll_incoming_msg_thread(MainWindow* main_window);
+	
+	~poll_incoming_msg_thread();
 
 signals:
 	
 	void append_message_to_history(const std::string&, const std::string&);
 
 protected:
-	[[noreturn]] void run() override;
+	void run() override;
 
 private:
 	MainWindow* main_window;
+};
+
+
+class switcher
+{
+public:
+	inline explicit switcher(MainWindow* mw);
+	
+	virtual void _switch() = 0;
+	
+	virtual void _unswitch() = 0;
+
+protected:
+	friend class switch_performer;
+	
+	MainWindow* mw;
+};
+
+class signup : public switcher
+{
+public:
+	explicit signup(MainWindow* mw);
+	
+	void _switch() override;
+	
+	void _unswitch() override;
+};
+
+class login : public switcher
+{
+public:
+	explicit login(MainWindow* mw);
+	
+	void _switch() override;
+	
+	void _unswitch() override;
+};
+
+class chat : public switcher
+{
+public:
+	explicit chat(MainWindow* mw);
+	
+	void _switch() override;
+	
+	void _unswitch() override;
+};
+
+class switch_performer
+{
+public:
+	switch_performer(MainWindow* mw);
+	
+	template <typename _Tp>
+	inline void switch_to();
+	
+	~switch_performer();
+
+private:
+	std::unique_ptr<switcher> sw;
+	MainWindow* mw;
 };
 
 #endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H

@@ -46,7 +46,7 @@ public:
 			args[12] = std::to_string(op[exec::pipe::write]).data();
 			args[13] = nullptr;
 			
-			pid_t pid = exec::execute_program(args, nullptr);
+			pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 			auto exitcode = exec::wait_for_program(pid);
 			std::clog << "Backend executed with exit code " << exitcode << ".\n";
 			::close(op[exec::pipe::write]);
@@ -78,7 +78,7 @@ public:
 			args[12] = std::to_string(op[exec::pipe::write]).data();
 			args[13] = nullptr;
 			
-			pid_t pid = exec::execute_program(args, nullptr);
+			pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 			auto exitcode = exec::wait_for_program(pid);
 			std::clog << "Backend executed with exit code " << exitcode << ".\n";
 			::close(op[exec::pipe::write]);
@@ -109,7 +109,7 @@ public:
 		args[14] = opstr.data();
 		args[15] = nullptr;
 		
-		pid_t pid = exec::execute_program(args, nullptr);
+		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
@@ -139,7 +139,7 @@ public:
 		args[14] = opstr.data();
 		args[15] = nullptr;
 		
-		pid_t pid = exec::execute_program(args, nullptr);
+		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
@@ -171,7 +171,7 @@ public:
 		args[14] = opstr.data();
 		args[13] = nullptr;
 		
-		pid_t pid = exec::execute_program(args, nullptr);
+		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
@@ -198,7 +198,7 @@ public:
 		args[12] = std::to_string(op[exec::pipe::write]).data();
 		args[13] = nullptr;
 		
-		pid_t pid = exec::execute_program(args, nullptr);
+		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
@@ -229,7 +229,7 @@ public:
 		args[14] = opstr.data();
 		args[15] = nullptr;
 		
-		pid_t pid = exec::execute_program(args, nullptr);
+		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
@@ -260,7 +260,7 @@ public:
 		args[14] = opstr.data();
 		args[15] = nullptr;
 		
-		pid_t pid = exec::execute_program(args, nullptr);
+		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
@@ -301,7 +301,7 @@ public:
 		args[14] = opstr.data();
 		args[15] = nullptr;
 		
-		pid_t pid = exec::execute_program(args, nullptr);
+		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
@@ -348,7 +348,7 @@ public:
 		wr_pipe(prikey);
 		::close(ip[exec::pipe::write]);
 		
-		pid_t pid = exec::execute_program(args, nullptr);
+		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(ip[exec::pipe::read]);
@@ -384,7 +384,7 @@ public:
 		wr_pipe(prikey);
 		::close(ip[exec::pipe::write]);
 		
-		pid_t pid = exec::execute_program(args, nullptr);
+		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(ip[exec::pipe::read]);

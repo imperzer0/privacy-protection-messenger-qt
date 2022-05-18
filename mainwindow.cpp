@@ -1,8 +1,9 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <xor-crypt-defs>
 
 #define CLASS_NAME_STR(class) #class
-#define DYNAMIC_TEXT_TRANSLATE(str) QCoreApplication::translate("HardcodedString", str)
+#define DYNAMIC_TEXT_TRANSLATE(str) QCoreApplication::translate(CLASS_NAME_STR(HardcodedString), str)
 
 #define INVALID_CREDENTIALS_TITLE DYNAMIC_TEXT_TRANSLATE("Invalid credentials!")
 #define INVALID_SERVER_TITLE DYNAMIC_TEXT_TRANSLATE("Invalid server address!")
@@ -21,6 +22,53 @@
 #define NO_USER_SEL_STR DYNAMIC_TEXT_TRANSLATE("First select user for conversation.")
 
 
+inline static bool validate_number(char* str)
+{
+	for (; *str; ++str)
+		if (!isdigit(*str))
+			return false;
+	return true;
+}
+
+inline static bool validate_ip(std::string ip)
+{
+	auto tmp = ip.data();
+	for (; *tmp; ++tmp)
+		if (*tmp == ':')
+		{
+			*tmp = 0;
+			if (!validate_number(tmp + 1)) return false;
+			long port = ::atoi(tmp + 1);
+			if (port != (uint16_t)port) return false;
+			break;
+		}
+	
+	in_addr addr{ };
+	if (::inet_aton(ip.data(), &addr) == 0)
+		return false;
+	
+	return true;
+}
+
+
+switch_performer::switch_performer(MainWindow* mw) : mw(mw), sw(nullptr)
+{ }
+
+template <typename _Tp>
+void switch_performer::switch_to()
+{
+	if (sw) sw->_unswitch();
+	sw = std::unique_ptr<switcher>(new _Tp(mw));
+	sw->_switch();
+}
+
+switch_performer::~switch_performer()
+{
+	if (sw) sw->_unswitch();
+	sw = nullptr;
+}
+
+
 MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent), ui(new Ui::MainWindow), thread(std::make_unique<poll_incoming_msg_thread>(this))
 {
@@ -28,7 +76,10 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->setupUi(this);
 	refresh_address_indicators();
 	auto doclayout = this->ui->line_message->document()->documentLayout();
-	connect(doclayout, SIGNAL(documentSizeChanged(const QSizeF&)), this, SLOT(line_message_height_changed(const QSizeF&)));
+	connect(
+			doclayout, &QAbstractTextDocumentLayout::documentSizeChanged,
+			this, &MainWindow::line_message_height_changed
+	);
 }
 
 MainWindow::~MainWindow()
@@ -94,41 +145,13 @@ void MainWindow::on_actionMoskalian_triggered()
 
 void MainWindow::on_button_already_registered_clicked()
 {
-	switch_to_log_in();
+	current_page->switch_to<login>();
 }
 
 
 void MainWindow::on_button_not_registered_clicked()
 {
-	switch_to_sign_up();
-}
-
-inline static bool validate_number(char* str)
-{
-	for (; *str; ++str)
-		if (!isdigit(*str))
-			return false;
-	return true;
-}
-
-inline static bool validate_ip(std::string ip)
-{
-	auto tmp = ip.data();
-	for (; *tmp; ++tmp)
-		if (*tmp == ':')
-		{
-			*tmp = 0;
-			if (!validate_number(tmp + 1)) return false;
-			long port = ::atoi(tmp + 1);
-			if (port != (uint16_t)port) return false;
-			break;
-		}
-	
-	in_addr addr{ };
-	if (::inet_aton(ip.data(), &addr) == 0)
-		return false;
-	
-	return true;
+	current_page->switch_to<signup>();
 }
 
 inline bool MainWindow::assert_data(const QString& login, const QString& password)
@@ -322,46 +345,8 @@ void MainWindow::on_action_Logout_triggered()
 	if (backend)
 	{
 		backend = nullptr;
-		switch_to_log_in();
+		current_page->switch_to<login>();
 	}
-}
-
-void MainWindow::switch_to_sign_up()
-{
-	auto* root = this->ui->stackedWidget->widget(0);
-	this->ui->stackedWidget->currentWidget()->setEnabled(false);
-	this->ui->stackedWidget->setCurrentWidget(root);
-	root->setEnabled(!backend.operator bool());
-	this->ui->line_login_reg->setEnabled(!backend.operator bool());
-	this->ui->line_pass_reg->setEnabled(!backend.operator bool());
-	this->ui->line_display_name->setEnabled(!backend.operator bool());
-	this->ui->button_sign_up->setEnabled(!backend.operator bool());
-	this->ui->button_already_registered->setEnabled(!backend.operator bool());
-}
-
-void MainWindow::switch_to_log_in()
-{
-	auto* root = this->ui->stackedWidget->widget(1);
-	this->ui->stackedWidget->currentWidget()->setEnabled(false);
-	this->ui->stackedWidget->setCurrentWidget(root);
-	root->setEnabled(!backend.operator bool());
-	this->ui->line_login_log->setEnabled(!backend.operator bool());
-	this->ui->line_pass_log->setEnabled(!backend.operator bool());
-	this->ui->button_log_in->setEnabled(!backend.operator bool());
-	this->ui->button_not_registered->setEnabled(!backend.operator bool());
-}
-
-void MainWindow::switch_to_messaging()
-{
-	auto* root = this->ui->stackedWidget->widget(2);
-	this->ui->stackedWidget->currentWidget()->setEnabled(false);
-	this->ui->stackedWidget->setCurrentWidget(root);
-	root->setEnabled(backend.operator bool());
-	this->ui->button_send->setEnabled(backend.operator bool());
-	this->ui->message_browser->setEnabled(backend.operator bool());
-	this->ui->line_message->setEnabled(backend.operator bool());
-	this->ui->search_friends->setEnabled(backend.operator bool());
-	this->ui->friends_list_widget->setEnabled(backend.operator bool());
 }
 
 void MainWindow::line_message_height_changed(const QSizeF& new_size)
@@ -421,7 +406,7 @@ void MainWindow::sign_up()
 		backend = nullptr;
 		return;
 	}
-	switch_to_messaging();
+	current_page->switch_to<chat>();
 	this->ui->line_login_reg->clear();
 	this->ui->line_pass_reg->clear();
 	this->ui->line_display_name->clear();
@@ -442,7 +427,7 @@ void MainWindow::log_in()
 		backend = nullptr;
 		return;
 	}
-	switch_to_messaging();
+	current_page->switch_to<chat>();
 	this->ui->line_login_log->clear();
 	this->ui->line_pass_log->clear();
 }
@@ -456,7 +441,7 @@ poll_incoming_msg_thread::poll_incoming_msg_thread(MainWindow* main_window) : ma
 	);
 }
 
-[[noreturn]] void poll_incoming_msg_thread::run()
+void poll_incoming_msg_thread::run()
 {
 	while (true)
 	{
@@ -473,4 +458,99 @@ poll_incoming_msg_thread::poll_incoming_msg_thread(MainWindow* main_window) : ma
 		}
 		else ::sleep(1);
 	}
+}
+
+poll_incoming_msg_thread::~poll_incoming_msg_thread()
+{
+	::exit(0);
+}
+
+
+switcher::switcher(MainWindow* mw) : mw(mw)
+{ }
+
+
+signup::signup(MainWindow* mw) : switcher(mw)
+{ }
+
+void signup::_switch()
+{
+	auto* root = mw->ui->stackedWidget->widget(0);
+	mw->ui->stackedWidget->setCurrentWidget(root);
+	root->setEnabled(!mw->backend.operator bool());
+	mw->ui->line_login_reg->setEnabled(!mw->backend.operator bool());
+	mw->ui->line_login_reg->clear();
+	mw->ui->line_pass_reg->setEnabled(!mw->backend.operator bool());
+	mw->ui->line_pass_reg->clear();
+	mw->ui->line_display_name->setEnabled(!mw->backend.operator bool());
+	mw->ui->line_display_name->clear();
+	mw->ui->button_sign_up->setEnabled(!mw->backend.operator bool());
+	mw->ui->button_already_registered->setEnabled(!mw->backend.operator bool());
+}
+
+void signup::_unswitch()
+{
+	mw->ui->stackedWidget->currentWidget()->setEnabled(false);
+	mw->ui->line_login_reg->setEnabled(false);
+	mw->ui->line_pass_reg->setEnabled(false);
+	mw->ui->line_display_name->setEnabled(false);
+	mw->ui->button_sign_up->setEnabled(false);
+	mw->ui->button_already_registered->setEnabled(false);
+}
+
+
+login::login(MainWindow* mw) : switcher(mw)
+{ }
+
+void login::_switch()
+{
+	auto* root = mw->ui->stackedWidget->widget(1);
+	mw->ui->stackedWidget->currentWidget()->setEnabled(false);
+	mw->ui->stackedWidget->setCurrentWidget(root);
+	root->setEnabled(!mw->backend.operator bool());
+	mw->ui->line_login_log->setEnabled(!mw->backend.operator bool());
+	mw->ui->line_login_log->clear();
+	mw->ui->line_pass_log->setEnabled(!mw->backend.operator bool());
+	mw->ui->line_pass_log->clear();
+	mw->ui->button_log_in->setEnabled(!mw->backend.operator bool());
+	mw->ui->button_not_registered->setEnabled(!mw->backend.operator bool());
+}
+
+void login::_unswitch()
+{
+	mw->ui->stackedWidget->currentWidget()->setEnabled(false);
+	mw->ui->line_login_log->setEnabled(false);
+	mw->ui->line_pass_log->setEnabled(false);
+	mw->ui->button_log_in->setEnabled(false);
+	mw->ui->button_not_registered->setEnabled(false);
+}
+
+
+chat::chat(MainWindow* mw) : switcher(mw)
+{ }
+
+void chat::_switch()
+{
+	auto* root = mw->ui->stackedWidget->widget(2);
+	mw->ui->stackedWidget->setCurrentWidget(root);
+	root->setEnabled(mw->backend.operator bool());
+	mw->ui->button_send->setEnabled(mw->backend.operator bool());
+	mw->ui->message_browser->setEnabled(mw->backend.operator bool());
+	mw->ui->message_browser->clear();
+	mw->ui->line_message->setEnabled(mw->backend.operator bool());
+	mw->ui->line_message->clear();
+	mw->ui->search_friends->setEnabled(mw->backend.operator bool());
+	mw->ui->search_friends->clear();
+	mw->ui->friends_list_widget->setEnabled(mw->backend.operator bool());
+	mw->ui->friends_list_widget->clear();
+}
+
+void chat::_unswitch()
+{
+	mw->ui->stackedWidget->currentWidget()->setEnabled(false);
+	mw->ui->button_send->setEnabled(false);
+	mw->ui->message_browser->setEnabled(false);
+	mw->ui->line_message->setEnabled(false);
+	mw->ui->search_friends->setEnabled(false);
+	mw->ui->friends_list_widget->setEnabled(false);
 }
