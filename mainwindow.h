@@ -12,7 +12,6 @@
 #include <memory>
 #include <arpa/inet.h>
 #include <string>
-#include <xor-crypt>
 #include "call_backend.hpp"
 
 QT_BEGIN_NAMESPACE
@@ -21,6 +20,15 @@ namespace Ui
 	class MainWindow;
 }
 QT_END_NAMESPACE
+
+typedef enum : int
+{
+	page_invalid = -1,
+	page_password,
+	page_signup,
+	page_login,
+	page_chat
+} pages;
 
 class poll_incoming_msg_thread;
 
@@ -76,6 +84,8 @@ private slots:
 	void insert_mine_message_into_history(const std::string& msg);
 	
 	void insert_extraneous_message_into_history(const std::string& msg, const std::string& username);
+	
+	void on_button_donate_clicked();
 
 private:
 	Ui::MainWindow* ui;
@@ -84,6 +94,7 @@ private:
 	QString server_address = "127.0.0.1";
 	std::unique_ptr<poll_incoming_msg_thread> thread = nullptr;
 	std::unique_ptr<switch_performer> current_page = std::make_unique<switch_performer>(this);
+	time_t prev = 0;
 	
 	void refresh_address_indicators();
 	

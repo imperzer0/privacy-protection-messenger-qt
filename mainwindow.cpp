@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include <xor-crypt-defs>
+#include <QDesktopServices>
 
 #define CLASS_NAME_STR(class) #class
 #define DYNAMIC_TEXT_TRANSLATE(str) QCoreApplication::translate(CLASS_NAME_STR(HardcodedString), str)
@@ -400,6 +400,7 @@ void MainWindow::sign_up()
 		backend = nullptr;
 		return;
 	}
+	::usleep(100000);
 	if (!backend->begin_session())
 	{
 		QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Authorisation failed"), SESSION_NOT_STARTED_STR);
@@ -475,7 +476,7 @@ signup::signup(MainWindow* mw) : switcher(mw)
 
 void signup::_switch()
 {
-	auto* root = mw->ui->stackedWidget->widget(0);
+	auto* root = mw->ui->stackedWidget->widget(page_signup);
 	mw->ui->stackedWidget->setCurrentWidget(root);
 	root->setEnabled(!mw->backend.operator bool());
 	mw->ui->line_login_reg->setEnabled(!mw->backend.operator bool());
@@ -504,7 +505,7 @@ login::login(MainWindow* mw) : switcher(mw)
 
 void login::_switch()
 {
-	auto* root = mw->ui->stackedWidget->widget(1);
+	auto* root = mw->ui->stackedWidget->widget(page_login);
 	mw->ui->stackedWidget->currentWidget()->setEnabled(false);
 	mw->ui->stackedWidget->setCurrentWidget(root);
 	root->setEnabled(!mw->backend.operator bool());
@@ -531,7 +532,7 @@ chat::chat(MainWindow* mw) : switcher(mw)
 
 void chat::_switch()
 {
-	auto* root = mw->ui->stackedWidget->widget(2);
+	auto* root = mw->ui->stackedWidget->widget(page_chat);
 	mw->ui->stackedWidget->setCurrentWidget(root);
 	root->setEnabled(mw->backend.operator bool());
 	mw->ui->button_send->setEnabled(mw->backend.operator bool());
@@ -554,3 +555,15 @@ void chat::_unswitch()
 	mw->ui->search_friends->setEnabled(false);
 	mw->ui->friends_list_widget->setEnabled(false);
 }
+
+
+void MainWindow::on_button_donate_clicked()
+{
+	time_t curr = ::time(nullptr);
+	if (curr - prev > 10)
+	{
+		QDesktopServices::openUrl(QUrl("https://send.monobank.ua/2cYVmsqCzE"));
+		prev = curr;
+	}
+}
+
