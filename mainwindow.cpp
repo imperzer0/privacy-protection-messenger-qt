@@ -328,7 +328,7 @@ void MainWindow::on_action_Set_server_triggered()
 	{
 		if (!validate_ip(address.toStdString()))
 		{
-			QMessageBox::critical(this, INVALID_SERVER_TITLE, INVALID_SERVER_IP_STR + " \"" + server_address + "\"");
+			QMessageBox::critical(this, INVALID_SERVER_TITLE, INVALID_SERVER_IP_STR + " \"" + address + "\"");
 			return;
 		}
 		
