@@ -95,6 +95,7 @@ private:
 	std::unique_ptr<poll_incoming_msg_thread> thread = nullptr;
 	std::unique_ptr<switch_performer> current_page = std::make_unique<switch_performer>(this);
 	time_t prev = 0;
+	std::string current_user;
 	
 	void refresh_address_indicators();
 	
@@ -103,6 +104,8 @@ private:
 	void remove_all_attributes(QDomElement& node);
 	
 	void insert_message_into_history(const std::string& msg, const std::string& username, const std::string& border_color, const std::string& align);
+	
+	void set_online_status_label(bool online);
 	
 	void log_in();
 	

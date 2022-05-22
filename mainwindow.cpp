@@ -218,22 +218,22 @@ void MainWindow::on_button_send_clicked()
 		while (msg_text.back() == '\n') msg_text.chop(1);
 		msg_text.replace("\n", "<br/>");
 		auto message = msg_text.toStdString();
-		auto current_user = this->ui->label_current_user->text();
-		if (!current_user.isEmpty())
+		if (!current_user.empty())
 		{
-			bool self_send = backend->my_login() == current_user.toStdString();
+			bool self_send = backend->my_login() == current_user;
 			bool online = false;
-			if (!self_send && !backend->check_online_status(online, current_user.toStdString()))
+			if (!self_send && !backend->check_online_status(online, current_user))
 			{
 				QMessageBox::critical(this, DYNAMIC_TEXT_TRANSLATE("Can't obtain online status"), NO_ONLINE_STATUS_STR);
 				return;
 			}
 			
+			set_online_status_label(online);
+			
 			if (self_send || online)
 			{
 				if (self_send || backend->send_message(
-						current_user.toStdString(),
-						std::vector<uint8_t>{message.begin(), message.end()}
+						current_user, std::vector<uint8_t>{message.begin(), message.end()}
 				))
 				{
 					this->ui->line_message->clear();
@@ -248,7 +248,7 @@ void MainWindow::on_button_send_clicked()
 
 void MainWindow::insert_mine_message_into_history(const std::string& msg)
 {
-	insert_message_into_history(msg, "You", "yellow", "right");
+	insert_message_into_history(msg, backend->my_login(), "yellow", "right");
 }
 
 void MainWindow::insert_extraneous_message_into_history(const std::string& msg, const std::string& username)
@@ -262,8 +262,7 @@ void MainWindow::insert_message_into_history(
 	QDomDocument message("msg");
 	message.setContent(
 			QString{
-					("<table><tr><td>" + username + "</td></tr><tr><td><pre>" + msg + "</pre></td></tr></table>")
-							.c_str()
+					("<table><tr><td>" + username + "</td></tr><tr><td><pre>" + msg + "</pre></td></tr></table>").c_str()
 			}
 	);
 	auto me = message.documentElement();
@@ -295,10 +294,8 @@ void MainWindow::insert_message_into_history(
 	this->ui->message_browser->setHtml(exported_history);
 }
 
-void MainWindow::on_friends_list_widget_itemActivated(QListWidgetItem* item)
+void MainWindow::set_online_status_label(bool online)
 {
-	bool online = false;
-	backend->check_online_status(online, item->text().toStdString());
 	this->ui->label_online_status->setText(online ? "[online]" : "[offline]");
 	this->ui->label_online_status->setStyleSheet(
 			online ?
@@ -313,7 +310,15 @@ void MainWindow::on_friends_list_widget_itemActivated(QListWidgetItem* item)
 			"margin-right: 50;\n"
 			"padding: 2;"
 	);
-	this->ui->label_current_user->setText(item->text());
+}
+
+void MainWindow::on_friends_list_widget_itemActivated(QListWidgetItem* item)
+{
+	bool online = false;
+	backend->check_online_status(online, item->text().toStdString());
+	set_online_status_label(online);
+	current_user = item->text().toStdString();
+	this->ui->label_current_user->setText("Chatting with \"" + item->text() + "\"");
 }
 
 void MainWindow::on_action_Set_server_triggered()
@@ -321,6 +326,12 @@ void MainWindow::on_action_Set_server_triggered()
 	auto address = QInputDialog::getText(this, ASK_FOR_SERVER_TITLE, SERVER_COLON_STR);
 	if (!address.isEmpty())
 	{
+		if (!validate_ip(address.toStdString()))
+		{
+			QMessageBox::critical(this, INVALID_SERVER_TITLE, INVALID_SERVER_IP_STR + " \"" + server_address + "\"");
+			return;
+		}
+		
 		server_address = address;
 		refresh_address_indicators();
 	}
@@ -329,7 +340,7 @@ void MainWindow::on_action_Set_server_triggered()
 
 void MainWindow::on_action_Disconnect_from_server_triggered()
 {
-	server_address = "";
+	server_address = "127.0.0.1";
 	refresh_address_indicators();
 }
 
@@ -544,6 +555,9 @@ void chat::_switch()
 	mw->ui->search_friends->clear();
 	mw->ui->friends_list_widget->setEnabled(mw->backend.operator bool());
 	mw->ui->friends_list_widget->clear();
+	mw->ui->label_current_user->clear();
+	mw->ui->label_online_status->clear();
+	mw->current_user.clear();
 }
 
 void chat::_unswitch()
