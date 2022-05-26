@@ -182,20 +182,21 @@ public:
 		return res;
 	}
 	
-	inline bool get_display_name(std::string& display_name)
+	inline bool get_display_name(std::string& display_name, std::string target_login)
 	{
 		char* args[]{
 				backend, "-m", "client", "-a", PLACEHOLDER, "-o", PLACEHOLDER,
 				"-l", PLACEHOLDER, "-p", PLACEHOLDER,
-				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				"-M", PLACEHOLDER,
+				"-O", PLACEHOLDER, "-I", PLACEHOLDER,
 				nullptr
 		};
 		args[4] = address.data();
 		args[6] = "s_get_display_name";
 		args[8] = login.data();
 		args[10] = password.data();
-		args[12] = std::to_string(op[exec::pipe::write]).data();
+		args[12] = target_login.data();
+		args[14] = std::to_string(op[exec::pipe::write]).data();
 		args[13] = nullptr;
 		
 		pid_t pid = exec::execute_program(args, nullptr, exec::linux_file_descriptor(1).redirect_to(::open("/dev/null", O_WRONLY)));
@@ -404,6 +405,11 @@ public:
 	const std::string& my_login()
 	{
 		return login;
+	}
+	
+	bool is_session_began()
+	{
+		return began_session;
 	}
 
 private:

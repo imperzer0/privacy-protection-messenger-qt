@@ -68,6 +68,7 @@ switch_performer::~switch_performer()
 	sw = nullptr;
 }
 
+std::recursive_mutex MainWindow::mutex;
 
 MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent), ui(new Ui::MainWindow), thread(std::make_unique<poll_incoming_msg_thread>(this))
@@ -404,6 +405,8 @@ void MainWindow::sign_up()
 	
 	if (!assert_data(login, password)) return;
 	
+	mutex.lock();
+	
 	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
 	if (!backend->register_user(this->ui->line_display_name->text().toStdString()))
 	{
@@ -419,9 +422,8 @@ void MainWindow::sign_up()
 		return;
 	}
 	current_page->switch_to<chat>();
-	this->ui->line_login_reg->clear();
-	this->ui->line_pass_reg->clear();
-	this->ui->line_display_name->clear();
+	
+	mutex.unlock();
 }
 
 
@@ -432,6 +434,8 @@ void MainWindow::log_in()
 	
 	if (!assert_data(login, password)) return;
 	
+	mutex.lock();
+	
 	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
 	if (!backend->begin_session())
 	{
@@ -440,8 +444,8 @@ void MainWindow::log_in()
 		return;
 	}
 	current_page->switch_to<chat>();
-	this->ui->line_login_log->clear();
-	this->ui->line_pass_log->clear();
+	
+	mutex.unlock();
 }
 
 
@@ -453,20 +457,28 @@ poll_incoming_msg_thread::poll_incoming_msg_thread(MainWindow* main_window) : ma
 	);
 }
 
-void poll_incoming_msg_thread::run()
+[[noreturn]] void poll_incoming_msg_thread::run()
 {
 	while (true)
 	{
-		if (main_window->backend)
+		if (main_window->backend && main_window->backend->is_session_began())
 		{
 			std::string user;
 			std::vector<uint8_t> message;
+			
+			MainWindow::mutex.lock();
+			
 			if (main_window->backend->query_incoming(user, message))
 			{
+				MainWindow::mutex.unlock();
 				emit append_message_to_history({message.begin(), message.end()}, user);
 				::usleep(50000);
 			}
-			else ::sleep(1);
+			else
+			{
+				MainWindow::mutex.unlock();
+				::sleep(1);
+			}
 		}
 		else ::sleep(1);
 	}
@@ -545,15 +557,15 @@ void chat::_switch()
 {
 	auto* root = mw->ui->stackedWidget->widget(page_chat);
 	mw->ui->stackedWidget->setCurrentWidget(root);
-	root->setEnabled(mw->backend.operator bool());
-	mw->ui->button_send->setEnabled(mw->backend.operator bool());
-	mw->ui->message_browser->setEnabled(mw->backend.operator bool());
+	root->setEnabled(mw->backend.operator bool() && mw->backend->is_session_began());
+	mw->ui->button_send->setEnabled(mw->backend.operator bool() && mw->backend->is_session_began());
+	mw->ui->message_browser->setEnabled(mw->backend.operator bool() && mw->backend->is_session_began());
 	mw->ui->message_browser->clear();
-	mw->ui->line_message->setEnabled(mw->backend.operator bool());
+	mw->ui->line_message->setEnabled(mw->backend.operator bool() && mw->backend->is_session_began());
 	mw->ui->line_message->clear();
-	mw->ui->search_friends->setEnabled(mw->backend.operator bool());
+	mw->ui->search_friends->setEnabled(mw->backend.operator bool() && mw->backend->is_session_began());
 	mw->ui->search_friends->clear();
-	mw->ui->friends_list_widget->setEnabled(mw->backend.operator bool());
+	mw->ui->friends_list_widget->setEnabled(mw->backend.operator bool() && mw->backend->is_session_began());
 	mw->ui->friends_list_widget->clear();
 	mw->ui->label_current_user->clear();
 	mw->ui->label_online_status->clear();

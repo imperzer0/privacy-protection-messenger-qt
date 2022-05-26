@@ -96,6 +96,7 @@ private:
 	std::unique_ptr<switch_performer> current_page = std::make_unique<switch_performer>(this);
 	time_t prev = 0;
 	std::string current_user;
+	static std::recursive_mutex mutex;
 	
 	void refresh_address_indicators();
 	
@@ -110,8 +111,7 @@ private:
 	void log_in();
 	
 	void sign_up();
-
-private:
+	
 	friend class poll_incoming_msg_thread;
 	
 	friend class switcher;
@@ -138,7 +138,7 @@ signals:
 	void append_message_to_history(const std::string&, const std::string&);
 
 protected:
-	void run() override;
+	[[noreturn]] void run() override;
 
 private:
 	MainWindow* main_window;
