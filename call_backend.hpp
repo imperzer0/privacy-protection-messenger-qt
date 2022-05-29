@@ -266,15 +266,17 @@ public:
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
 		
+		list.clear();
+		
 		bool res = false;
 		rd_pipe(res);
 		if (res)
 		{
 			size_t size;
 			rd_pipe(size);
-			std::string tmp;
 			for (size_t i = 0; i < size; ++i)
 			{
+				std::string tmp;
 				rd_pipe(tmp);
 				list.push_back(tmp);
 			}
@@ -306,6 +308,8 @@ public:
 		auto exitcode = exec::wait_for_program(pid);
 		std::clog << "Backend executed with exit code " << exitcode << ".\n";
 		::close(op[exec::pipe::write]);
+		
+		list.clear();
 		
 		bool res = false;
 		rd_pipe(res);

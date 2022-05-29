@@ -12,6 +12,7 @@
 #include <memory>
 #include <arpa/inet.h>
 #include <string>
+#include <xor-crypt>
 #include "call_backend.hpp"
 
 QT_BEGIN_NAMESPACE
@@ -75,7 +76,13 @@ private slots:
 	
 	void on_friends_list_widget_itemActivated(QListWidgetItem* item);
 	
+	void on_line_pass_reg_returnPressed();
+	
+	void on_line_login_reg_returnPressed();
+	
 	void on_line_display_name_returnPressed();
+	
+	void on_line_login_log_returnPressed();
 	
 	void on_line_pass_log_returnPressed();
 	
@@ -86,6 +93,8 @@ private slots:
 	void insert_extraneous_message_into_history(const std::string& msg, const std::string& username);
 	
 	void on_button_donate_clicked();
+	
+	void on_line_locking_password_returnPressed();
 
 private:
 	Ui::MainWindow* ui;
@@ -97,14 +106,21 @@ private:
 	time_t prev = 0;
 	std::string current_user;
 	static std::recursive_mutex mutex;
+	std::unique_ptr<xc::xor_encrypt> xe = nullptr;
+	std::unique_ptr<xc::xor_decrypt> xd = nullptr;
 	
-	void refresh_address_indicators();
+	void refresh_title();
 	
 	inline bool assert_data(const QString& login, const QString& password);
 	
 	void remove_all_attributes(QDomElement& node);
 	
-	void insert_message_into_history(const std::string& msg, const std::string& username, const std::string& border_color, const std::string& align);
+	void insert_message_into_history(
+			const std::string& msg, const std::string& username, const std::string& chat, const std::string& border_color, const std::string& align);
+	
+	std::string load_history(const std::string& chat);
+	
+	void save_history(const std::string& chat, const std::string& history);
 	
 	void set_online_status_label(bool online);
 	
@@ -114,7 +130,7 @@ private:
 	
 	friend class poll_incoming_msg_thread;
 	
-	friend class switcher;
+	friend class switch_performer;
 	
 	friend class signup;
 	
@@ -203,6 +219,17 @@ public:
 private:
 	std::unique_ptr<switcher> sw;
 	MainWindow* mw;
+};
+
+class mutex_auto_lock
+{
+public:
+	mutex_auto_lock(std::recursive_mutex* mutex);
+	
+	~mutex_auto_lock();
+
+private:
+	std::recursive_mutex* mutex;
 };
 
 #endif // PRIVACY_PROTECTION_MESSENGER_QT_MAINWINDOW_H

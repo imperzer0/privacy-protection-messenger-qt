@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QDesktopServices>
+#include <xor-crypt-defs>
 
 #define CLASS_NAME_STR(class) #class
 #define DYNAMIC_TEXT_TRANSLATE(str) QCoreApplication::translate(CLASS_NAME_STR(HardcodedString), str)
@@ -20,6 +21,9 @@
 #define NO_ONLINE_STATUS_STR DYNAMIC_TEXT_TRANSLATE("Can not get user online status. Maybe user does not exist.")
 #define USER_OFFLINE_STR DYNAMIC_TEXT_TRANSLATE("You can't send messages to offline users.")
 #define NO_USER_SEL_STR DYNAMIC_TEXT_TRANSLATE("First select user for conversation.")
+
+#define MESSENGER_DIR ".local/share/privacy-protection-messenger/"
+#define HISTORY_SIZE_RESTRICTION 524288
 
 
 inline static bool validate_number(char* str)
@@ -60,6 +64,7 @@ void switch_performer::switch_to()
 	if (sw) sw->_unswitch();
 	sw = std::unique_ptr<switcher>(new _Tp(mw));
 	sw->_switch();
+	sw->mw->refresh_title();
 }
 
 switch_performer::~switch_performer()
@@ -73,9 +78,10 @@ std::recursive_mutex MainWindow::mutex;
 MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent), ui(new Ui::MainWindow), thread(std::make_unique<poll_incoming_msg_thread>(this))
 {
+	::system("mkdir -pm700 " MESSENGER_DIR);
 	thread->start(QThread::LowestPriority);
 	ui->setupUi(this);
-	refresh_address_indicators();
+	refresh_title();
 	auto doclayout = this->ui->line_message->document()->documentLayout();
 	connect(
 			doclayout, &QAbstractTextDocumentLayout::documentSizeChanged,
@@ -113,7 +119,7 @@ bool MainWindow::set_language(const QString& language)
 		if (QCoreApplication::installTranslator(m_translator.get()))
 		{
 			this->ui->retranslateUi(this);
-			refresh_address_indicators();
+			refresh_title();
 			return true;
 		}
 	}
@@ -219,8 +225,22 @@ void MainWindow::on_button_send_clicked()
 		while (msg_text.back() == '\n') msg_text.chop(1);
 		msg_text.replace("\n", "<br/>");
 		auto message = msg_text.toStdString();
+		QDomDocument msg("msg");
+		QString error;
+		int line, column;
+		if (!msg.setContent("<body>" + msg_text + "</body>", &error, &line, &column))
+		{
+			QMessageBox::critical(
+					this, DYNAMIC_TEXT_TRANSLATE("Invalid xml in message"),
+					DYNAMIC_TEXT_TRANSLATE("Error ") + "\"" + error + "\"" +
+					DYNAMIC_TEXT_TRANSLATE(" occurred while parsing message on ") +
+					(std::to_string(line) + ":" + std::to_string(column) + ".").c_str());
+			return;
+		}
 		if (!current_user.empty())
 		{
+			mutex_auto_lock locker(&mutex);
+			
 			bool self_send = backend->my_login() == current_user;
 			bool online = false;
 			if (!self_send && !backend->check_online_status(online, current_user))
@@ -249,21 +269,26 @@ void MainWindow::on_button_send_clicked()
 
 void MainWindow::insert_mine_message_into_history(const std::string& msg)
 {
-	insert_message_into_history(msg, backend->my_login(), "yellow", "right");
+	insert_message_into_history(msg, backend->my_login(), current_user, "yellow", "right");
 }
 
 void MainWindow::insert_extraneous_message_into_history(const std::string& msg, const std::string& username)
 {
-	insert_message_into_history(msg, username, "rgb(12, 120, 255)", "left");
+	insert_message_into_history(msg, username, username, "rgb(12, 120, 255)", "left");
 }
 
 void MainWindow::insert_message_into_history(
-		const std::string& msg, const std::string& username, const std::string& border_color, const std::string& align)
+		const std::string& msg, const std::string& username, const std::string& chat, const std::string& border_color, const std::string& align)
 {
+	std::string now(64, 0);
+	time_t nowtime = time(nullptr);
+	::strftime(now.data(), 64, "%H:%M:%S %d.%m.%Y", localtime(&nowtime));
+	now = now.data();
 	QDomDocument message("msg");
 	message.setContent(
 			QString{
-					("<table><tr><td>" + username + "</td></tr><tr><td><pre>" + msg + "</pre></td></tr></table>").c_str()
+					("<table><tr><td>" + username + "</td></tr><tr><td><pre>" + msg +
+					 "</pre></td></tr><tr><td><pre style='color: yellow;'>" + now + "</pre></td></tr></table>").c_str()
 			}
 	);
 	auto me = message.documentElement();
@@ -273,7 +298,10 @@ void MainWindow::insert_message_into_history(
 	me.setAttribute("style", ("margin: 6px; background-color: rgb(30, 22, 1); border-width: 2px; border-color: " + border_color + ";").c_str());
 	
 	QDomDocument history("history");
-	history.setContent(this->ui->message_browser->toHtml());
+	auto hist = load_history(chat);
+	long hist_size = hist.size();
+	std::cerr << " > hist.size == " << hist_size << "\n";
+	history.setContent(QString{hist.c_str()});
 	auto he = history.documentElement();
 	auto n = he.firstChild();
 	while (!n.isNull())
@@ -281,6 +309,16 @@ void MainWindow::insert_message_into_history(
 		auto e = n.toElement();
 		if (!e.isNull() && e.nodeName() == "body")
 		{
+			while (hist_size >= HISTORY_SIZE_RESTRICTION)
+			{
+				QString exported_child;
+				{
+					QTextStream stream(&exported_child);
+					e.firstChild().save(stream, 0);
+				}
+				hist_size -= exported_child.size();
+				e.removeChild(e.firstChild());
+			}
 			e.insertAfter(me, e.lastChild());
 			break;
 		}
@@ -292,7 +330,48 @@ void MainWindow::insert_message_into_history(
 		QTextStream stream(&exported_history);
 		history.save(stream, 0);
 	}
-	this->ui->message_browser->setHtml(exported_history);
+	
+	save_history(chat, exported_history.toStdString());
+	
+	if (chat == current_user)
+		this->ui->message_browser->setHtml(exported_history);
+}
+
+std::string MainWindow::load_history(const std::string& chat)
+{
+	std::unique_ptr<FILE, decltype(&::fclose)> file(::fopen((MESSENGER_DIR + chat + ".history").c_str(), "rb"), &::fclose);
+	if (file)
+	{
+		xd->reset_iter();
+		xd->set_source(new xc::file_source(file.get()));
+		struct stat st{ };
+		::fstat(file->_fileno, &st);
+		if (st.st_size)
+		{
+			std::string buf(st.st_size, 0);
+			xd->read(buf.data(), st.st_size);
+			return buf;
+		}
+	}
+	return "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+		   "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+		   "p, li { white-space: pre-wrap; }\n"
+		   "hr { height: 1px; border-width: 0; }\n"
+		   "</style></head><body style=\" font-family:'Consolas for Powerline'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+		   "</body></html>";
+}
+
+void MainWindow::save_history(const std::string& chat, const std::string& history)
+{
+	auto filename = MESSENGER_DIR + chat + ".history";
+	std::unique_ptr<FILE, decltype(&::fclose)> file(::fopen(filename.c_str(), "wb"), &::fclose);
+	if (file)
+	{
+		xe->reset_iter();
+		xe->set_destination(new xc::file_destination(file.get()));
+		xe->write(history.c_str(), history.size());
+	}
+	else std::cerr << "File \"" << filename << "\" open failed: " << ::strerrorname_np(errno) << " " << ::strerrordesc_np(errno) << "\n";
 }
 
 void MainWindow::set_online_status_label(bool online)
@@ -319,7 +398,8 @@ void MainWindow::on_friends_list_widget_itemActivated(QListWidgetItem* item)
 	backend->check_online_status(online, item->text().toStdString());
 	set_online_status_label(online);
 	current_user = item->text().toStdString();
-	this->ui->label_current_user->setText("Chatting with \"" + item->text() + "\"");
+	this->ui->label_current_user->setText(DYNAMIC_TEXT_TRANSLATE("Chatting with ") + "\"" + item->text() + "\"");
+	this->ui->message_browser->setHtml(QString{load_history(current_user).c_str()});
 }
 
 void MainWindow::on_action_Set_server_triggered()
@@ -334,7 +414,7 @@ void MainWindow::on_action_Set_server_triggered()
 		}
 		
 		server_address = address;
-		refresh_address_indicators();
+		refresh_title();
 	}
 }
 
@@ -342,12 +422,15 @@ void MainWindow::on_action_Set_server_triggered()
 void MainWindow::on_action_Disconnect_from_server_triggered()
 {
 	server_address = "127.0.0.1";
-	refresh_address_indicators();
+	refresh_title();
 }
 
-void MainWindow::refresh_address_indicators()
+void MainWindow::refresh_title()
 {
-	setWindowTitle("Privacy Protection Messenger (" + ON_SERVER_STR + " \"" + server_address + "\")");
+	setWindowTitle(
+			("Privacy Protection Messenger ( \"" + (backend ? backend->my_login() : "") + "\" ").c_str() +
+			ON_SERVER_STR + " \"" + server_address + "\")"
+	);
 	this->ui->action_Server_address->setText(SERVER_COLON_STR + " " + server_address);
 }
 
@@ -367,15 +450,32 @@ void MainWindow::line_message_height_changed(const QSizeF& new_size)
 }
 
 
+void MainWindow::on_line_pass_reg_returnPressed()
+{
+	sign_up();
+}
+
+void MainWindow::on_line_login_reg_returnPressed()
+{
+	sign_up();
+}
+
 void MainWindow::on_line_display_name_returnPressed()
 {
 	sign_up();
+}
+
+
+void MainWindow::on_line_login_log_returnPressed()
+{
+	log_in();
 }
 
 void MainWindow::on_line_pass_log_returnPressed()
 {
 	log_in();
 }
+
 
 void MainWindow::on_search_friends_returnPressed()
 {
@@ -405,7 +505,7 @@ void MainWindow::sign_up()
 	
 	if (!assert_data(login, password)) return;
 	
-	mutex.lock();
+	mutex_auto_lock locker(&mutex);
 	
 	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
 	if (!backend->register_user(this->ui->line_display_name->text().toStdString()))
@@ -422,8 +522,6 @@ void MainWindow::sign_up()
 		return;
 	}
 	current_page->switch_to<chat>();
-	
-	mutex.unlock();
 }
 
 
@@ -434,7 +532,7 @@ void MainWindow::log_in()
 	
 	if (!assert_data(login, password)) return;
 	
-	mutex.lock();
+	mutex_auto_lock locker(&mutex);
 	
 	backend = std::make_unique<call_backend>(server_address.toStdString(), login.toStdString(), password.toStdString());
 	if (!backend->begin_session())
@@ -444,8 +542,6 @@ void MainWindow::log_in()
 		return;
 	}
 	current_page->switch_to<chat>();
-	
-	mutex.unlock();
 }
 
 
@@ -466,21 +562,16 @@ poll_incoming_msg_thread::poll_incoming_msg_thread(MainWindow* main_window) : ma
 			std::string user;
 			std::vector<uint8_t> message;
 			
-			MainWindow::mutex.lock();
+			mutex_auto_lock locker(&MainWindow::mutex);
 			
 			if (main_window->backend->query_incoming(user, message))
 			{
-				MainWindow::mutex.unlock();
 				emit append_message_to_history({message.begin(), message.end()}, user);
 				::usleep(50000);
-			}
-			else
-			{
-				MainWindow::mutex.unlock();
-				::sleep(1);
+				continue;
 			}
 		}
-		else ::sleep(1);
+		::sleep(1);
 	}
 }
 
@@ -593,3 +684,21 @@ void MainWindow::on_button_donate_clicked()
 	}
 }
 
+
+void MainWindow::on_line_locking_password_returnPressed()
+{
+	auto password = this->ui->line_locking_password->text().toStdString();
+	xe = std::make_unique<xc::xor_encrypt>(password);
+	xd = std::make_unique<xc::xor_decrypt>(password);
+	current_page->switch_to<signup>();
+}
+
+mutex_auto_lock::mutex_auto_lock(std::recursive_mutex* mutex) : mutex(mutex)
+{
+	mutex->lock();
+}
+
+mutex_auto_lock::~mutex_auto_lock()
+{
+	mutex->unlock();
+}

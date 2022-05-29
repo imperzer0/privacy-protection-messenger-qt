@@ -1,13 +1,13 @@
 pkgname="privacy-protection-messenger-qt"
-pkgver=2.7
+pkgver=2.8
 pkgrel=0
 pkgdesc="Privacy Protection Messenger Qt GUI"
 author="imperzer0"
 url="https://github.com/$author/$pkgname"
 arch=("x86_64")
 license=('GPL3')
-depends=("qt6-base" "privacy-protection-messenger>=1.3-4")
-makedepends=("cmake>=3.0" "qt6-base" "execute-process-linux=2.5-0")
+depends=("qt6-base" "privacy-protection-messenger>=2.0-2")
+makedepends=("cmake>=3.0" "qt6-base" "execute-process-linux=2.5-0" "xor-crypto-lib>=1.12-0")
 
 _srcprefix="local:/"
 _languages=("uk_UA" "ru_UA" "ru_RU")
